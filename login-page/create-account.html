@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Nexus Chat Create Account</title>
+
+<style>
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+}
+
+body{
+    min-height:100vh;
+    background-image:url("create-account-background.png");
+    background-size:cover;
+    background-position:center;
+    background-repeat:no-repeat;
+    font-family:Arial, sans-serif;
+    color:white;
+}
+
+.create-account-page{
+    min-height:100vh;
+    background:rgba(255,255,255,0.1);
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    gap:clamp(30px, 8vw, 120px);
+    padding:clamp(24px, 5vw, 70px);
+}
+
+.brand-section{
+    flex:0 0 auto;
+}
+
+.brand-logo{
+    width:clamp(120px, 18vw, 250px);
+    aspect-ratio:1;
+    border-radius:55%;
+    object-fit:cover;
+    box-shadow:0 20px 45px rgba(20, 20, 20, 0.45);
+}
+
+.create-account-card{
+    width:min(100%, 520px);
+    padding:clamp(30px, 5vw, 50px);
+    background:rgba(20,20,20,0.55);
+    border-radius:20px;
+    backdrop-filter:blur(15px);
+    box-shadow:0 15px 40px rgba(0,0,0,0.35);
+}
+
+.create-account-heading{
+    text-align:center;
+    font-size:clamp(1.8rem, 4vw, 2.3rem);
+    color:white;
+    margin-bottom:clamp(24px, 4vw, 35px);
+}
+.subtitle{
+    text-align:center;
+    color:rgba(27, 179, 254, 0.872);
+    margin-top:-20px;
+    margin-bottom:30px;
+}
+
+#create-account-form{
+    display:flex;
+    flex-direction:column;
+    gap:16px;
+}
+
+.form-group{
+    display:flex;
+    flex-direction:column;
+    gap:6px;
+}
+
+.input-field{
+    width:100%;
+    padding:clamp(14px, 3vw, 18px) 18px;
+    border:none;
+    border-radius:12px;
+    background:#2c2c2c;
+    color:white;
+    font-size:1rem;
+}
+
+.input-field::placeholder{
+    color:white;
+}
+
+.input-field:focus{
+    outline:none;
+    box-shadow:0 0 0 2px rgba(96,165,250,0.75);
+}
+
+.input-field.error{
+    box-shadow:0 0 0 2px rgba(248,113,113,0.9);
+}
+
+.error-message{
+    min-height:18px;
+    color:#fecaca;
+    font-size:0.85rem;
+    line-height:1.3;
+}
+
+.primary-btn{
+    margin-top:10px;
+    padding:clamp(14px, 3vw, 16px);
+    border:none;
+    border-radius:12px;
+    background:#2563eb;
+    color:white;
+    font-size:1.05rem;
+    font-weight:bold;
+    cursor:pointer;
+    transition:0.3s;
+}
+
+.primary-btn:hover{
+    transform:translateY(-2px);
+}
+
+@media (max-width:600px){
+
+    .create-account-page{
+        flex-direction:column;
+        justify-content:flex-start;
+        padding-top:35px;
+    }
+
+    .create-account-card{
+        width:100%;
+    }
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="create-account-page">
+
+    <div class="brand-section">
+        <img src="nexus-logo.png" alt="Nexus Chat Logo" class="brand-logo">
+    </div>
+
+    <div class="create-account-card">
+
+        <h2 class="create-account-heading">Welcome</h2>
+        <p class="subtitle">Create your Nexus Chat account</p>
+        <form id="create-account-form" novalidate>
+            <div class="form-group">
+                <input
+                    type="text"
+                    id="username"
+                    class="input-field"
+                    placeholder="Username"
+                    autocomplete="username"
+                >
+                <span class="error-message" id="username-error"></span>
+            </div>
+            <div class="form-group">
+                <input
+                    type="email"
+                    id="email"
+                    class="input-field"
+                    placeholder="Email"
+                    autocomplete="email"
+                >
+                <span class="error-message" id="email-error"></span>
+            </div>
+            <div class="form-group">
+                <input
+                    type="password"
+                    id="password"
+                    class="input-field"
+                    placeholder="Password"
+                    autocomplete="new-password"
+                >
+                <span class="error-message" id="password-error"></span>
+            </div>
+            <div class="form-group">
+                <input
+                    type="password"
+                    id="confirm-password"
+                    class="input-field"
+                    placeholder="Confirm Password"
+                    autocomplete="new-password"
+                >
+                <span class="error-message" id="confirm-password-error"></span>
+            </div>
+
+            <button
+                type="submit"
+                id="create-btn"
+                class="primary-btn"
+            >
+                Create Account
+            </button>
+        </form>
+    </div>
+</div>
+
+<script>
+    const createAccountForm = document.getElementById("create-account-form");
+    const username = document.getElementById("username");
+    const email = document.getElementById("email");
+    const password = document.getElementById("password");
+    const confirmPassword = document.getElementById("confirm-password");
+    let createAccountSubmitted = false;
+
+    const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    const usernamePattern = /^[A-Za-z0-9_]+$/;
+
+    function showError(input, message){
+        const errorText = document.getElementById(`${input.id}-error`);
+        input.classList.toggle("error", Boolean(message));
+        errorText.textContent = message;
+    }
+
+    function validateCreateAccount(){
+        let isValid = true;
+        const usernameValue = username.value.trim();
+        const emailValue = email.value.trim();
+        const passwordValue = password.value;
+        const confirmPasswordValue = confirmPassword.value;
+
+        if(usernameValue.length < 3){
+            showError(username, "Username must be at least 3 characters.");
+            isValid = false;
+        }
+        else if(!usernamePattern.test(usernameValue)){
+            showError(username, "Use only letters, numbers, and underscores.");
+            isValid = false;
+        }
+        else{
+            showError(username, "");
+        }
+
+        if(!emailValue){
+            showError(email, "Email is required.");
+            isValid = false;
+        }
+        else if(!emailPattern.test(emailValue)){
+            showError(email, "Enter a valid email address.");
+            isValid = false;
+        }
+        else{
+            showError(email, "");
+        }
+
+        if(passwordValue.length < 8){
+            showError(password, "Password must be at least 8 characters.");
+            isValid = false;
+        }
+        else if(!/[A-Za-z]/.test(passwordValue) || !/[0-9]/.test(passwordValue)){
+            showError(password, "Password must include letters and numbers.");
+            isValid = false;
+        }
+        else{
+            showError(password, "");
+        }
+
+        if(!confirmPasswordValue){
+            showError(confirmPassword, "Confirm your password.");
+            isValid = false;
+        }
+        else if(confirmPasswordValue !== passwordValue){
+            showError(confirmPassword, "Passwords do not match.");
+            isValid = false;
+        }
+        else{
+            showError(confirmPassword, "");
+        }
+
+        return isValid;
+    }
+
+    createAccountForm.addEventListener("submit", function(event){
+        event.preventDefault();
+        createAccountSubmitted = true;
+
+        if(validateCreateAccount()){
+            alert("Account created successfully!");
+            window.location.href = "login-page.html";
+        }
+    });
+
+    [username, email, password, confirmPassword].forEach(function(input){
+        input.addEventListener("input", function(){
+            if(createAccountSubmitted){
+                validateCreateAccount();
+            }
+        });
+    });
+</script>
+</body>
+</html>
+

@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Nexus Settings</title>
+
+<link rel="stylesheet"
+href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+<style>
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+}
+
+body{
+    min-height:100vh;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    font-family:Segoe UI,sans-serif;
+    background-image:url("chat-background.png");
+    background-size:cover;
+    background-position:center;
+    background-repeat:no-repeat;
+    color:white;
+    padding:clamp(80px, 12vh, 110px) clamp(16px, 4vw, 30px) 30px;
+}
+
+body::before{
+    content:"";
+    position:fixed;
+    inset:0;
+    background:rgba(3,8,20,0.60);
+    z-index:-1;
+}
+
+/* Back Button */
+
+.back-btn{
+    position:absolute;
+    top:clamp(16px, 4vw, 25px);
+    left:clamp(16px, 4vw, 25px);
+    width:clamp(44px, 8vw, 50px);
+    height:clamp(44px, 8vw, 50px);
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    border-radius:50%;
+    background:rgba(255,255,255,0.08);
+    backdrop-filter:blur(15px);
+    color:white;
+    text-decoration:none;
+    font-size:clamp(19px, 4vw, 22px);
+    transition:.3s;
+}
+
+.back-btn:hover{
+    transform:translateX(-4px);
+    background:rgba(255,255,255,0.15);
+}
+
+/* Settings Card */
+
+.settings-card{
+    width:min(100%,500px);
+    background:rgba(8,18,40,0.45);
+    backdrop-filter:blur(20px);
+    border:1px solid rgba(255,255,255,0.08);
+    border-radius:20px;
+    padding:clamp(20px, 5vw, 30px);
+}
+
+.settings-title{
+    text-align:center;
+    margin-bottom:25px;
+}
+
+.settings-title h1{
+    font-size:clamp(1.6rem, 5vw, 2rem);
+}
+
+/* Menu Items */
+
+.setting-item{
+    display:flex;
+    align-items:center;
+    gap:15px;
+    padding:clamp(14px, 4vw, 18px);
+    margin-bottom:12px;
+    border-radius:12px;
+    background:rgba(255,255,255,0.05);
+    cursor:pointer;
+    transition:.3s;
+}
+
+.setting-item:hover{
+    background:rgba(255,255,255,0.10);
+    transform:translateX(5px);
+}
+
+.setting-item i{
+    font-size:20px;
+    width:25px;
+    flex-shrink:0;
+}
+
+.setting-item span{
+    font-size:clamp(0.95rem, 3vw, 1rem);
+    min-width:0;
+    overflow:hidden;
+    text-overflow:ellipsis;
+    white-space:nowrap;
+}
+
+/* Mobile */
+
+@media(max-width:768px){
+    .settings-card{
+        width:100%;
+    }
+}
+
+@media(max-width:380px){
+    .setting-item{
+        gap:12px;
+    }
+}
+</style>
+</head>
+
+<body>
+<a href="chat-page.html" class="back-btn">
+    <i class="fa-solid fa-arrow-left"></i>
+</a>
+<div class="settings-card">
+
+    <div class="settings-title">
+        <h1>Nexus Settings</h1>
+    </div>
+
+    <div class="setting-item">
+        <i class="fa-solid fa-user"></i>
+        <span>Profile</span>
+    </div>
+
+    <div class="setting-item">
+        <i class="fa-solid fa-envelope"></i>
+        <span>Change Email</span>
+    </div>
+
+    <div class="setting-item">
+        <i class="fa-solid fa-lock"></i>
+        <span>Change Password</span>
+    </div>
+
+    <div class="setting-item">
+        <i class="fa-solid fa-image"></i>
+        <span>Change Background</span>
+    </div>
+
+    <div class="setting-item">
+        <i class="fa-solid fa-moon"></i>
+        <span>Theme</span>
+    </div>
+
+    <div class="setting-item">
+        <i class="fa-solid fa-robot"></i>
+        <span>AI Preferences</span>
+    </div>
+
+    <div class="setting-item">
+        <i class="fa-solid fa-right-from-bracket"></i>
+        <span>Logout</span>
+    </div>
+
+</div>
+
+</body>
+</html>

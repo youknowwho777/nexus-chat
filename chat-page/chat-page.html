@@ -1,0 +1,630 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Nexus Chat</title>
+
+<link rel="stylesheet"
+href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+<style>
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+}
+
+body{
+    min-height:100vh;
+    font-family:Segoe UI,sans-serif;
+    background-image:url("chat-background.png");
+    background-size:cover;
+    background-position:center;
+    background-repeat:no-repeat;
+    color:white;
+    overflow:hidden;
+    position:relative;
+}
+/* Dark overlay */
+body::before{
+    content:"";
+    position:absolute;
+    inset:0;
+    background:rgba(3,8,20,0.55);
+    z-index:-1;
+}
+/* Main Container */
+.chat-page{
+    min-height:100vh;
+    height:100dvh;
+    display:flex;
+    flex-direction:column;
+}
+/* ==========================
+        NAVBAR
+========================== */
+.chat-navbar{
+    min-height:72px;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:18px;
+    padding:0 clamp(14px, 3vw, 25px);
+    background:rgba(5,15,35,0.55);
+    backdrop-filter:blur(15px);
+    border-bottom:1px solid rgba(255,255,255,0.08);
+}
+
+.logo-section{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    min-width:0;
+}
+
+.logo-section img{
+    width:clamp(44px, 6vw, 52px);
+    aspect-ratio:1;
+    border-radius:50%;
+    object-fit:cover;
+    transition:0.3s;
+}
+
+.logo-section img:hover{
+    transform:scale(1.05);
+}
+
+.logo-section h2{
+    font-size:clamp(1.05rem, 3vw, 1.4rem);
+    font-weight:600;
+    white-space:nowrap;
+}
+
+.settings-link{
+    width:45px;
+    height:45px;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    border-radius:50%;
+    background:rgba(255,255,255,0.08);
+    cursor:pointer;
+    transition:0.3s;
+    text-decoration:none;
+    color:white;
+    font-size:22px;
+    flex-shrink:0;
+}
+
+.settings-link:hover{
+    background:rgba(255,255,255,0.15);
+    transform:rotate(30deg);
+}
+
+/* ==========================
+      CONTENT SECTION
+========================== */
+
+.chat-content{
+    flex:1;
+    display:flex;
+    min-height:0;
+    overflow:hidden;
+}
+
+/* ==========================
+         SIDEBAR
+========================== */
+
+.sidebar{
+    width:clamp(280px, 32vw, 360px);
+    background:rgba(8,18,40,0.45);
+    backdrop-filter:blur(18px);
+    border-right:1px solid rgba(255,255,255,0.08);
+    display:flex;
+    flex-direction:column;
+    padding:clamp(12px, 2vw, 16px);
+    min-width:0;
+}
+
+/* Search */
+
+.search-box{
+    margin-bottom:15px;
+}
+
+.search-box input{
+    width:100%;
+    padding:12px 15px;
+    border:none;
+    outline:none;
+    border-radius:12px;
+    background:rgba(255,255,255,0.08);
+    color:white;
+    font-size:0.95rem;
+}
+
+.search-box input::placeholder{
+    color:#bfc6d8;
+}
+
+/* Chat List */
+
+.chat-list{
+    flex:1;
+    overflow-y:auto;
+    min-height:0;
+}
+
+/* Scrollbar */
+
+.chat-list::-webkit-scrollbar{
+    width:6px;
+}
+
+.chat-list::-webkit-scrollbar-thumb{
+    background:#4d8cff;
+    border-radius:20px;
+}
+
+/* Chat Card */
+
+.chat-card{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    padding:12px;
+    margin-bottom:8px;
+    border-radius:14px;
+    cursor:pointer;
+    transition:0.3s;
+    min-width:0;
+}
+
+.chat-card:hover{
+    background:rgba(255,255,255,0.08);
+    transform:translateX(3px);
+}
+
+.chat-card.active{
+    background:rgba(77,140,255,0.22);
+}
+
+.chat-card.hidden{
+    display:none;
+}
+
+/* Profile */
+.profile-pic{
+    width:50px;
+    aspect-ratio:1;
+    border-radius:50%;
+    background:linear-gradient(
+        135deg,
+        #4da3ff,
+        #8a5cff
+    );
+    flex-shrink:0;
+}
+
+/* Chat Info */
+.chat-info{
+    min-width:0;
+}
+
+.chat-info h4{
+    margin-bottom:4px;
+    font-size:1rem;
+    overflow:hidden;
+    text-overflow:ellipsis;
+    white-space:nowrap;
+}
+
+.chat-info p{
+    font-size:0.85rem;
+    color:#c2c9d9;
+    overflow:hidden;
+    text-overflow:ellipsis;
+    white-space:nowrap;
+}
+
+/* ==========================
+        CHAT AREA
+========================== */
+
+.chat-area{
+    flex:1;
+    display:flex;
+    flex-direction:column;
+    padding:clamp(22px, 4vw, 40px);
+    min-width:0;
+}
+
+.welcome-box{
+    margin:auto;
+    max-width:600px;
+    text-align:center;
+}
+
+.welcome-box h1{
+    font-size:clamp(2rem, 5vw, 3rem);
+    margin-bottom:15px;
+}
+
+.welcome-box p{
+    font-size:clamp(0.95rem, 2vw, 1.1rem);
+    color:#d2d8e5;
+    margin-bottom:10px;
+}
+
+.conversation{
+    width:100%;
+    height:100%;
+    display:none;
+    flex-direction:column;
+    min-height:0;
+}
+
+.conversation.active{
+    display:flex;
+}
+
+.chat-header{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    padding-bottom:16px;
+    border-bottom:1px solid rgba(255,255,255,0.10);
+}
+
+.back-to-list{
+    display:none;
+    width:40px;
+    height:40px;
+    border:none;
+    border-radius:50%;
+    background:rgba(255,255,255,0.08);
+    color:white;
+    font-size:18px;
+    cursor:pointer;
+}
+
+.chat-title{
+    text-align:left;
+    min-width:0;
+}
+
+.chat-title h3{
+    font-size:1.1rem;
+    margin-bottom:3px;
+}
+
+.chat-title p{
+    color:#c2c9d9;
+    font-size:0.85rem;
+}
+
+.message-list{
+    flex:1;
+    display:flex;
+    flex-direction:column;
+    gap:12px;
+    overflow-y:auto;
+    padding:18px 0;
+}
+
+.message{
+    max-width:min(75%, 520px);
+    padding:12px 14px;
+    border-radius:14px;
+    line-height:1.4;
+    text-align:left;
+}
+
+.message.received{
+    align-self:flex-start;
+    background:rgba(255,255,255,0.10);
+}
+
+.message.sent{
+    align-self:flex-end;
+    background:#2563eb;
+}
+
+.message-form{
+    display:flex;
+    gap:10px;
+    padding-top:14px;
+    border-top:1px solid rgba(255,255,255,0.10);
+}
+
+.message-form input{
+    flex:1;
+    min-width:0;
+    padding:13px 15px;
+    border:none;
+    outline:none;
+    border-radius:12px;
+    background:rgba(255,255,255,0.08);
+    color:white;
+    font-size:0.95rem;
+}
+
+.message-form input::placeholder{
+    color:#bfc6d8;
+}
+
+.message-form button{
+    width:48px;
+    border:none;
+    border-radius:12px;
+    background:#2563eb;
+    color:white;
+    font-size:17px;
+    cursor:pointer;
+}
+
+/* ==========================
+      RESPONSIVE DESIGN
+========================== */
+@media(max-width:900px){
+
+    .sidebar{
+        width:45%;
+        min-width:260px;
+    }
+
+    .welcome-box{
+        max-width:420px;
+    }
+}
+
+@media(max-width:700px){
+
+    body{
+        overflow:auto;
+    }
+
+    .chat-page{
+        height:auto;
+        min-height:100dvh;
+    }
+
+    .chat-navbar{
+        min-height:68px;
+    }
+
+    .chat-content{
+        display:block;
+        overflow:visible;
+    }
+
+    .sidebar{
+        width:100%;
+        min-width:0;
+        min-height:calc(100dvh - 68px);
+        border-right:none;
+    }
+
+    .chat-area{
+        display:none;
+    }
+
+    .chat-content.chat-open .sidebar{
+        display:none;
+    }
+
+    .chat-content.chat-open .chat-area{
+        display:flex;
+        min-height:calc(100dvh - 68px);
+    }
+
+    .back-to-list{
+        display:flex;
+        justify-content:center;
+        align-items:center;
+        flex-shrink:0;
+    }
+}
+
+@media(max-width:380px){
+
+    .logo-section{
+        gap:8px;
+    }
+
+    .settings-link{
+        width:40px;
+        height:40px;
+        font-size:19px;
+    }
+
+    .chat-card{
+        padding:10px;
+    }
+
+    .profile-pic{
+        width:44px;
+    }
+}
+</style>
+</head>
+
+<body>
+<div class="chat-page">
+    <!-- NAVBAR -->
+    <header class="chat-navbar">
+        <div class="logo-section">
+            <img src="chat-logo.png" alt="Nexus Chat Logo">
+            <h2>Nexus Chat</h2>
+        </div>
+
+        <a href="settings-page.html" class="settings-link">
+            <i class="fa-solid fa-gear"></i>
+        </a>
+    </header>
+    <!-- MAIN CONTENT -->
+    <div class="chat-content">
+        <!-- SIDEBAR -->
+        <aside class="sidebar">
+            <div class="search-box">
+                <input
+                    id="chat-search"
+                    type="text"
+                    placeholder="Search chats..."
+                >
+            </div>
+            <div class="chat-list">
+                <div class="chat-card" data-name="Rahul" data-preview="Hello Bro...">
+                    <div class="profile-pic"></div>
+                    <div class="chat-info">
+                        <h4>Max</h4>
+                        <p>Hello Bro...</p>
+                    </div>
+                </div>
+                <div class="chat-card" data-name="Rishi" data-preview="How are you?">
+                    <div class="profile-pic"></div>
+                    <div class="chat-info">
+                        <h4>Rishi</h4>
+                        <p>How are you?</p>
+                    </div>
+                </div>
+                <div class="chat-card" data-name="Adharana" data-preview="PDF Sent">
+                    <div class="profile-pic"></div>
+                    <div class="chat-info">
+                        <h4>Adharana</h4>
+                        <p>PDF Sent</p>
+                    </div>
+                </div>
+                <div class="chat-card" data-name="Siddu" data-preview="Welcome to Nexus Chat!">
+                    <div class="profile-pic"></div>
+                    <div class="chat-info">
+                        <h4>Siddu (You)</h4>
+                        <p>Welcome to Nexus Chat!</p>
+                    </div>
+                </div>
+            </div>
+        </aside>
+        <!-- CHAT AREA -->
+        <main class="chat-area">
+            <div class="welcome-box" id="welcome-box">
+                <h1>Welcome to Nexus Chat</h1>
+                <p>Connect Beyond Boundaries</p>
+                <p>Select a conversation and start chatting.</p>
+            </div>
+            <div class="conversation" id="conversation">
+                <div class="chat-header">
+                    <button class="back-to-list" id="back-to-list" type="button">
+                        <i class="fa-solid fa-arrow-left"></i>
+                    </button>
+                    <div class="profile-pic"></div>
+                    <div class="chat-title">
+                        <h3 id="chat-name">Friend</h3>
+                        <p id="chat-status">Online</p>
+                    </div>
+                </div>
+                <div class="message-list" id="message-list"></div>
+                <form class="message-form" id="message-form">
+                    <input
+                        type="text"
+                        id="message-input"
+                        placeholder="Type a message..."
+                        autocomplete="off"
+                    >
+                    <button type="submit">
+                        <i class="fa-solid fa-paper-plane"></i>
+                    </button>
+                </form>
+            </div>
+        </main>
+    </div>
+</div>
+
+<script>
+    const chatContent = document.querySelector(".chat-content");
+    const chatSearch = document.getElementById("chat-search");
+    const chatCards = document.querySelectorAll(".chat-card");
+    const welcomeBox = document.getElementById("welcome-box");
+    const conversation = document.getElementById("conversation");
+    const chatName = document.getElementById("chat-name");
+    const chatStatus = document.getElementById("chat-status");
+    const messageList = document.getElementById("message-list");
+    const messageForm = document.getElementById("message-form");
+    const messageInput = document.getElementById("message-input");
+    const backToList = document.getElementById("back-to-list");
+
+    let activeChat = "";
+    const chatMessages = {
+        Rahul: ["Hello Bro..."],
+        Rishi: ["How are you?"],
+        Adharana: ["PDF Sent"],
+        Siddu: ["Welcome to Nexus Chat!"]
+    };
+
+    function renderMessages(name){
+        messageList.innerHTML = "";
+
+        chatMessages[name].forEach(function(message){
+            const messageBox = document.createElement("div");
+            messageBox.className = "message received";
+            messageBox.textContent = message;
+            messageList.appendChild(messageBox);
+        });
+    }
+
+    function openChat(card){
+        activeChat = card.dataset.name;
+        chatName.textContent = activeChat;
+        chatStatus.textContent = "Online";
+
+        chatCards.forEach(function(chatCard){
+            chatCard.classList.toggle("active", chatCard === card);
+        });
+
+        welcomeBox.style.display = "none";
+        conversation.classList.add("active");
+        chatContent.classList.add("chat-open");
+        renderMessages(activeChat);
+    }
+
+    chatCards.forEach(function(card){
+        card.addEventListener("click", function(){
+            openChat(card);
+        });
+    });
+
+    chatSearch.addEventListener("input", function(){
+        const searchValue = chatSearch.value.trim().toLowerCase();
+
+        chatCards.forEach(function(card){
+            const name = card.dataset.name.toLowerCase();
+            const preview = card.dataset.preview.toLowerCase();
+            const isMatch = name.includes(searchValue) || preview.includes(searchValue);
+            card.classList.toggle("hidden", !isMatch);
+        });
+    });
+
+    messageForm.addEventListener("submit", function(event){
+        event.preventDefault();
+
+        const messageText = messageInput.value.trim();
+        if(!messageText || !activeChat){
+            return;
+        }
+
+        const messageBox = document.createElement("div");
+        messageBox.className = "message sent";
+        messageBox.textContent = messageText;
+        messageList.appendChild(messageBox);
+        messageInput.value = "";
+        messageList.scrollTop = messageList.scrollHeight;
+    });
+
+    backToList.addEventListener("click", function(){
+        chatContent.classList.remove("chat-open");
+    });
+</script>
+</body>
+</html>

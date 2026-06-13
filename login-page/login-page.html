@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">  
+<title>Nexus Chat Login</title>
+
+<style>
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+}
+
+body{
+    min-height:100vh;
+    background-image:url("login-background.png");
+    background-size:cover;
+    background-position:center;
+    background-repeat:no-repeat;
+    font-family:Arial, sans-serif;
+    color:white;
+}
+
+.login-page{
+    min-height:100vh;
+    background:rgba(255,255,255,0.4);
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    gap:clamp(30px, 8vw, 120px);  /* clamp is for responsive design clamp(min, preferred,max)*/
+    padding:clamp(24px, 5vw, 70px);
+}
+
+.brand-section{
+    flex:0 0 auto;  /* 0: grow, 0: shrink , auto:basis  means NO shrink or stretch*/
+}
+
+.brand-logo{
+    width:clamp(120px, 18vw, 250px);
+    aspect-ratio:1; /*width : height = 1:1 */
+    border-radius:55%;
+    object-fit:cover;  /* cropping */
+    box-shadow:0 20px 45px rgba(20, 20, 20, 0.45);
+}
+
+.login-card{
+    width:min(100%, 520px);   /* another responsive function*/
+    padding:clamp(30px, 5vw, 50px);
+    background:rgba(20,20,20,0.55);
+    border-radius:20px;
+    backdrop-filter:blur(15px); /* Glassmorphism effect*/
+    box-shadow:0 15px 40px rgba(0,0,0,0.35);
+}
+
+.login-heading{
+    text-align:center;
+    font-size:clamp(1.8rem, 4vw, 2.3rem);  /*rem: browser default(16px) automatically increases size w.r.t browser font size*/
+    color:white;
+    margin-bottom:clamp(24px, 4vw, 35px);
+}
+
+#login-form{
+    display:flex;
+    flex-direction:column;
+    gap:16px;
+}
+
+.form-group{
+    display:flex;
+    flex-direction:column; /*default is horizantal so change to vertical*/
+    gap:6px;
+}
+
+.input-field{
+    width:100%;
+    padding:clamp(14px, 3vw, 18px) 18px;
+    border:none;
+    border-radius:12px;
+    background:#2c2c2c;
+    color:white;
+    font-size:1rem;
+}
+
+.input-field::placeholder{
+    color:white;
+}
+
+.input-field:focus{
+    outline:none;
+    box-shadow:0 0 4px 3px rgba(78, 175, 231, 0.75);
+}
+
+.input-field.error{
+    box-shadow:0 0 0 2px rgba(248,113,113,0.9);
+}
+
+.error-message{
+    min-height:18px;
+    color:#fecaca;
+    font-size:0.85rem;
+    line-height:1.3;
+}
+
+.primary-btn{
+    margin-top:10px;
+    padding:clamp(14px, 3vw, 16px);
+    border:none;
+    border-radius:12px;
+    background:#2563eb;
+    color:white;
+    font-size:1.05rem;
+    font-weight:bold;
+    cursor:pointer;
+    transition:0.3s;
+}
+
+.primary-btn:hover{
+    transform:translateY(-2px);
+}
+
+.create-account-text{
+    margin-top:18px;
+    text-align:center;
+    color:#d1d5db;
+}
+
+#create-account-link{
+    color:#60a5fa;
+    text-decoration:none;
+    font-weight:600;
+}
+
+#create-account-link:hover{
+    text-decoration:underline;
+}
+
+@media (max-width:600px){
+
+    .login-page{
+        flex-direction:column;
+        justify-content:flex-start;
+        padding-top:35px;
+        background:rgba(255,255,255,0.28);
+    }
+
+    .login-card{
+        width:100%;
+    }
+
+    .create-account-text{
+        line-height:1.5;  /*improves readability*/
+    }
+}
+</style>
+</head>
+
+<body>
+
+<div class="login-page">
+
+    <div class="brand-section">
+        <img src="nexus-logo.png" alt="Nexus Chat Logo" class="brand-logo">
+    </div>
+
+    <div class="login-card">
+        <h2 class="login-heading">Login</h2>
+        <form id="login-form" novalidate>  
+
+            <div class="form-group">
+                <input
+                    type="email"
+                    id="email"
+                    class="input-field"
+                    placeholder="Email"
+                    autocomplete="email"
+                >
+                <span class="error-message" id="email-error"></span>
+            </div>
+            <div class="form-group">
+                <input
+                    type="password"
+                    id="password"
+                    class="input-field"
+                    placeholder="Password"
+                    autocomplete="current-password"
+                >
+                <span class="error-message" id="password-error"></span>
+            </div>
+            <button
+                type="submit"
+                id="login-btn"
+                class="primary-btn"
+            >
+                Login 
+            </button>
+
+            <p class="create-account-text">
+                Don't have an account?
+                <a href="create-account.html" id="create-account-link">
+                    Create Account
+                </a>
+            </p>
+        </form>
+    </div>
+</div>
+<script>
+    const loginForm = document.getElementById("login-form");
+    const email = document.getElementById("email");
+    const password = document.getElementById("password");
+    const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;  // REGEX Expression (w3schools)
+    let loginSubmitted = false;
+
+    function showError(input, message){
+        const errorText = document.getElementById(`${input.id}-error`);
+        input.classList.toggle("error", Boolean(message));
+        errorText.textContent = message;
+    }
+
+    function validateLogin(){
+        let isValid = true;
+        const emailValue = email.value.trim();
+        const passwordValue = password.value;
+
+        if(!emailValue){
+            showError(email, "Email is required.");
+            isValid = false;
+        }
+        else if(!emailPattern.test(emailValue)){
+            showError(email, "Enter a valid email address.");
+            isValid = false;
+        }
+        else{
+            showError(email, "");
+        }
+
+        if(!passwordValue){
+            showError(password, "Password is required.");
+            isValid = false;
+        }
+        else{
+            showError(password, "");
+        }
+
+        return isValid;
+    }
+
+    loginForm.addEventListener("submit", function(event){
+        event.preventDefault();
+        loginSubmitted = true;
+
+        if(validateLogin()){
+            window.location.href = "../chat-page/chat-page.html";
+        }
+    });
+
+    [email, password].forEach(function(input){
+        input.addEventListener("input", function(){
+            if(loginSubmitted){
+                validateLogin();
+            }
+        });
+    });
+</script>
+</body>
+</html>
