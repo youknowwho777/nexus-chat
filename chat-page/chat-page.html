@@ -24,35 +24,33 @@ body{
     background-position:center;
     background-repeat:no-repeat;
     color:white;
-    overflow:hidden;
-    position:relative;
+    overflow:hidden; 
+    position:relative;  /* if not relative overlay positioning breaks*/
 }
-/* Dark overlay */
+/* Dark overlay on Background  */
 body::before{
     content:"";
     position:absolute;
-    inset:0;
-    background:rgba(3,8,20,0.55);
-    z-index:-1;
+    inset:0;  /*top,bottom,left,right : all 0 (covers entire page)*/
+    background:rgba(3,8,20, 0.55);
+    z-index:-1; /*pushes overlay behind content and over image*/
 }
-/* Main Container */
+
 .chat-page{
     min-height:100vh;
-    height:100dvh;
+    height:100dvh; 
     display:flex;
     flex-direction:column;
 }
-/* ==========================
-        NAVBAR
-========================== */
+
 .chat-navbar{
     min-height:72px;
     display:flex;
     justify-content:space-between;
     align-items:center;
     gap:18px;
-    padding:0 clamp(14px, 3vw, 25px);
-    background:rgba(5,15,35,0.55);
+    padding:0 clamp(14px, 3vw, 25px); /*side spaces top=bottom=0*/
+    background:rgba(5,15,35,0.55); /*glass like background*/
     backdrop-filter:blur(15px);
     border-bottom:1px solid rgba(255,255,255,0.08);
 }
@@ -61,7 +59,7 @@ body::before{
     display:flex;
     align-items:center;
     gap:12px;
-    min-width:0;
+    min-width:0; /*text overflow control during size shrinking*/
 }
 
 .logo-section img{
@@ -73,7 +71,7 @@ body::before{
 }
 
 .logo-section img:hover{
-    transform:scale(1.05);
+    transform:scale(1.2);
 }
 
 .logo-section h2{
@@ -100,12 +98,8 @@ body::before{
 
 .settings-link:hover{
     background:rgba(255,255,255,0.15);
-    transform:rotate(30deg);
+    transform:rotate(60deg);
 }
-
-/* ==========================
-      CONTENT SECTION
-========================== */
 
 .chat-content{
     flex:1;
@@ -113,10 +107,6 @@ body::before{
     min-height:0;
     overflow:hidden;
 }
-
-/* ==========================
-         SIDEBAR
-========================== */
 
 .sidebar{
     width:clamp(280px, 32vw, 360px);
@@ -128,8 +118,6 @@ body::before{
     padding:clamp(12px, 2vw, 16px);
     min-width:0;
 }
-
-/* Search */
 
 .search-box{
     margin-bottom:15px;
@@ -153,23 +141,20 @@ body::before{
 /* Chat List */
 
 .chat-list{
-    flex:1;
+    flex:1; /*below search remaining sidebar taken by the list */
     overflow-y:auto;
     min-height:0;
 }
 
-/* Scrollbar */
-
-.chat-list::-webkit-scrollbar{
+/*Custom Scrollbar */
+.chat-list::-webkit-scrollbar{ 
     width:6px;
 }
-
 .chat-list::-webkit-scrollbar-thumb{
     background:#4d8cff;
     border-radius:20px;
 }
 
-/* Chat Card */
 
 .chat-card{
     display:flex;
@@ -196,7 +181,6 @@ body::before{
     display:none;
 }
 
-/* Profile */
 .profile-pic{
     width:50px;
     aspect-ratio:1;
@@ -209,7 +193,6 @@ body::before{
     flex-shrink:0;
 }
 
-/* Chat Info */
 .chat-info{
     min-width:0;
 }
@@ -217,6 +200,8 @@ body::before{
 .chat-info h4{
     margin-bottom:4px;
     font-size:1rem;
+    
+    /*make long text into continueing test like hi....*/
     overflow:hidden;
     text-overflow:ellipsis;
     white-space:nowrap;
@@ -229,10 +214,6 @@ body::before{
     text-overflow:ellipsis;
     white-space:nowrap;
 }
-
-/* ==========================
-        CHAT AREA
-========================== */
 
 .chat-area{
     flex:1;
@@ -280,7 +261,7 @@ body::before{
 }
 
 .back-to-list{
-    display:none;
+    display:none;  /*back to list is only for Mobile version*/
     width:40px;
     height:40px;
     border:none;
@@ -324,12 +305,12 @@ body::before{
 }
 
 .message.received{
-    align-self:flex-start;
+    align-self:flex-start; /*moves to left side */
     background:rgba(255,255,255,0.10);
 }
 
 .message.sent{
-    align-self:flex-end;
+    align-self:flex-end;/*moves to right side */
     background:#2563eb;
 }
 
@@ -366,13 +347,10 @@ body::before{
     cursor:pointer;
 }
 
-/* ==========================
-      RESPONSIVE DESIGN
-========================== */
 @media(max-width:900px){
 
     .sidebar{
-        width:45%;
+        width:45%;  /*increase chat area as Total size decreases*/
         min-width:260px;
     }
 
@@ -397,7 +375,7 @@ body::before{
     }
 
     .chat-content{
-        display:block;
+        display:block; /*flex(side by  side) to block(up and down)  */
         overflow:visible;
     }
 
@@ -409,11 +387,11 @@ body::before{
     }
 
     .chat-area{
-        display:none;
+        display:none;/*hide chat area laptop style*/
     }
 
     .chat-content.chat-open .sidebar{
-        display:none;
+        display:none;  /*hide sidebar when caht is opened*/
     }
 
     .chat-content.chat-open .chat-area{
@@ -454,7 +432,6 @@ body::before{
 
 <body>
 <div class="chat-page">
-    <!-- NAVBAR -->
     <header class="chat-navbar">
         <div class="logo-section">
             <img src="chat-logo.png" alt="Nexus Chat Logo">
@@ -465,13 +442,10 @@ body::before{
             <i class="fa-solid fa-gear"></i>
         </a>
     </header>
-    <!-- MAIN CONTENT -->
     <div class="chat-content">
-        <!-- SIDEBAR -->
         <aside class="sidebar">
             <div class="search-box">
-                <input
-                    id="chat-search"
+                <input id="chat-search"
                     type="text"
                     placeholder="Search chats..."
                 >
@@ -507,16 +481,16 @@ body::before{
                 </div>
             </div>
         </aside>
-        <!-- CHAT AREA -->
         <main class="chat-area">
             <div class="welcome-box" id="welcome-box">
                 <h1>Welcome to Nexus Chat</h1>
                 <p>Connect Beyond Boundaries</p>
-                <p>Select a conversation and start chatting.</p>
+                <p>Select a friend and start chatting.</p>
             </div>
             <div class="conversation" id="conversation">
                 <div class="chat-header">
-                    <button class="back-to-list" id="back-to-list" type="button">
+                    <!--For Mobile Screens Design-->
+                    <button class="back-to-list" id="back-to-list" type="button">  
                         <i class="fa-solid fa-arrow-left"></i>
                     </button>
                     <div class="profile-pic"></div>
@@ -525,10 +499,10 @@ body::before{
                         <p id="chat-status">Online</p>
                     </div>
                 </div>
-                <div class="message-list" id="message-list"></div>
+                <div class="message-list" id="message-list"></div>  <!-- JS dynamically uses this to store chat sent amd recieved-->>
                 <form class="message-form" id="message-form">
                     <input
-                        type="text"
+                        type="text" 
                         id="message-input"
                         placeholder="Type a message..."
                         autocomplete="off"
@@ -556,7 +530,7 @@ body::before{
     const backToList = document.getElementById("back-to-list");
 
     let activeChat = "";
-    const chatMessages = {
+    const chatMessages = {  //Object with chats as arrays,even 'const' can take .push(element) to the arrays.
         Rahul: ["Hello Bro..."],
         Rishi: ["How are you?"],
         Adharana: ["PDF Sent"],
@@ -564,13 +538,13 @@ body::before{
     };
 
     function renderMessages(name){
-        messageList.innerHTML = "";
+        messageList.innerHTML = ""; //clean old messages
 
         chatMessages[name].forEach(function(message){
-            const messageBox = document.createElement("div");
-            messageBox.className = "message received";
-            messageBox.textContent = message;
-            messageList.appendChild(messageBox);
+            const messageBox = document.createElement("div");//create a div to store message
+            messageBox.className = "message received";//class name of that div
+            messageBox.textContent = message; //store key-value pairs value in that div.
+            messageList.appendChild(messageBox);//add this div inside message list 
         });
     }
 
@@ -579,13 +553,14 @@ body::before{
         chatName.textContent = activeChat;
         chatStatus.textContent = "Online";
 
-        chatCards.forEach(function(chatCard){
+        chatCards.forEach(function(chatCard){ //this is to highight the current chat card
             chatCard.classList.toggle("active", chatCard === card);
         });
 
         welcomeBox.style.display = "none";
-        conversation.classList.add("active");
-        chatContent.classList.add("chat-open");
+        //css part
+        conversation.classList.add("active"); //classList.add() makes class "conversation" -> "conversation active"
+        chatContent.classList.add("chat-open");//this doesnt replace the classname it add new class name too 
         renderMessages(activeChat);
     }
 
@@ -610,16 +585,16 @@ body::before{
         event.preventDefault();
 
         const messageText = messageInput.value.trim();
-        if(!messageText || !activeChat){
+        if(!messageText || !activeChat){ //prevents empty messages
             return;
         }
 
-        const messageBox = document.createElement("div");
+        const messageBox = document.createElement("div");//create a div message box
         messageBox.className = "message sent";
         messageBox.textContent = messageText;
         messageList.appendChild(messageBox);
-        messageInput.value = "";
-        messageList.scrollTop = messageList.scrollHeight;
+        messageInput.value = "";  //after sending clear the input box
+        messageList.scrollTop = messageList.scrollHeight; //Auto Scroll
     });
 
     backToList.addEventListener("click", function(){

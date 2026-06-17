@@ -246,18 +246,18 @@ body{
     }
 
     loginForm.addEventListener("submit", function(event){
-        event.preventDefault();
+        event.preventDefault();  //prevents default browser action like reloading page for submission
         loginSubmitted = true;
 
         if(validateLogin()){
-            window.location.href = "../chat-page/chat-page.html";
+            window.location.href = "../chat-page/chat-page.html";  //this tells to move to next page if evrything is correct
         }
     });
 
-    [email, password].forEach(function(input){
-        input.addEventListener("input", function(){
+    [email, password].forEach(function(input){   
+        input.addEventListener("input", function(){   //input event is triggered when text is changed.
             if(loginSubmitted){
-                validateLogin();
+                validateLogin();      //always validates when u make change in input.
             }
         });
     });
