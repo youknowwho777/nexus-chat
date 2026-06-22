@@ -80,6 +80,18 @@ Done:
 - Continued studying advanced JavaScript topics.
 - Practiced understanding concepts before adding more project features.
 
+## Day 8
+Understanding advanced JavaScript changes in the project.
+
+Done:
+- Connected recently learned JavaScript topics to the Nexus Chat files.
+- Started understanding how objects can organize chat data and form validation rules.
+- Started understanding how modules split page logic into separate reusable files.
+- Reviewed how promises, async functions, and await can prepare the project for future server communication.
+- Verified the updated files through a local server before debugging.
+
 ## Next Work
+- Continue understanding the advanced JavaScript changes tomorrow.
+- Review the new module files step by step before adding more features.
 - Continue the new workflow by creating `frontend` and `backend` folders.
 - Keep the older HTML/Python prototype files as reference until the new React/Node structure replaces them.
