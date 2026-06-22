@@ -57,6 +57,29 @@ Done:
 - Added chat selection and message display.
 - Added temporary frontend-only message sending.
 
+## Day 5
+Git and GitHub setup.
+
+Done:
+- Created the GitHub repository for Nexus Chat.
+- Initialized the project with git.
+- Made the first push to the remote repository.
+- Started tracking project progress and code changes properly.
+
+## Day 6
+Advanced JavaScript learning.
+
+Done:
+- Spent time learning a few advanced JavaScript topics.
+- Connected the concepts back to how they can help in the Nexus Chat project.
+
+## Day 7
+Advanced JavaScript learning continued.
+
+Done:
+- Continued studying advanced JavaScript topics.
+- Practiced understanding concepts before adding more project features.
+
 ## Next Work
-- Start the new workflow from Day 1: initialize git, add `.gitignore`, and create `frontend` and `backend` folders.
+- Continue the new workflow by creating `frontend` and `backend` folders.
 - Keep the older HTML/Python prototype files as reference until the new React/Node structure replaces them.

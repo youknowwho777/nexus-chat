@@ -347,6 +347,11 @@ body::before{
     cursor:pointer;
 }
 
+.message-form button:disabled{
+    cursor:not-allowed;
+    opacity:0.75;
+}
+
 @media(max-width:900px){
 
     .sidebar{
@@ -451,7 +456,7 @@ body::before{
                 >
             </div>
             <div class="chat-list">
-                <div class="chat-card" data-name="Rahul" data-preview="Hello Bro...">
+                <div class="chat-card" data-name="Max" data-preview="Hello Bro...">
                     <div class="profile-pic"></div>
                     <div class="chat-info">
                         <h4>Max</h4>
@@ -499,7 +504,7 @@ body::before{
                         <p id="chat-status">Online</p>
                     </div>
                 </div>
-                <div class="message-list" id="message-list"></div>  <!-- JS dynamically uses this to store chat sent amd recieved-->>
+                <div class="message-list" id="message-list"></div>  <!-- JS dynamically uses this to store chat sent and received -->
                 <form class="message-form" id="message-form">
                     <input
                         type="text" 
@@ -516,90 +521,6 @@ body::before{
     </div>
 </div>
 
-<script>
-    const chatContent = document.querySelector(".chat-content");
-    const chatSearch = document.getElementById("chat-search");
-    const chatCards = document.querySelectorAll(".chat-card");
-    const welcomeBox = document.getElementById("welcome-box");
-    const conversation = document.getElementById("conversation");
-    const chatName = document.getElementById("chat-name");
-    const chatStatus = document.getElementById("chat-status");
-    const messageList = document.getElementById("message-list");
-    const messageForm = document.getElementById("message-form");
-    const messageInput = document.getElementById("message-input");
-    const backToList = document.getElementById("back-to-list");
-
-    let activeChat = "";
-    const chatMessages = {  //Object with chats as arrays,even 'const' can take .push(element) to the arrays.
-        Rahul: ["Hello Bro..."],
-        Rishi: ["How are you?"],
-        Adharana: ["PDF Sent"],
-        Siddu: ["Welcome to Nexus Chat!"]
-    };
-
-    function renderMessages(name){
-        messageList.innerHTML = ""; //clean old messages
-
-        chatMessages[name].forEach(function(message){
-            const messageBox = document.createElement("div");//create a div to store message
-            messageBox.className = "message received";//class name of that div
-            messageBox.textContent = message; //store key-value pairs value in that div.
-            messageList.appendChild(messageBox);//add this div inside message list 
-        });
-    }
-
-    function openChat(card){
-        activeChat = card.dataset.name;
-        chatName.textContent = activeChat;
-        chatStatus.textContent = "Online";
-
-        chatCards.forEach(function(chatCard){ //this is to highight the current chat card
-            chatCard.classList.toggle("active", chatCard === card);
-        });
-
-        welcomeBox.style.display = "none";
-        //css part
-        conversation.classList.add("active"); //classList.add() makes class "conversation" -> "conversation active"
-        chatContent.classList.add("chat-open");//this doesnt replace the classname it add new class name too 
-        renderMessages(activeChat);
-    }
-
-    chatCards.forEach(function(card){
-        card.addEventListener("click", function(){
-            openChat(card);
-        });
-    });
-
-    chatSearch.addEventListener("input", function(){
-        const searchValue = chatSearch.value.trim().toLowerCase();
-
-        chatCards.forEach(function(card){
-            const name = card.dataset.name.toLowerCase();
-            const preview = card.dataset.preview.toLowerCase();
-            const isMatch = name.includes(searchValue) || preview.includes(searchValue);
-            card.classList.toggle("hidden", !isMatch);
-        });
-    });
-
-    messageForm.addEventListener("submit", function(event){
-        event.preventDefault();
-
-        const messageText = messageInput.value.trim();
-        if(!messageText || !activeChat){ //prevents empty messages
-            return;
-        }
-
-        const messageBox = document.createElement("div");//create a div message box
-        messageBox.className = "message sent";
-        messageBox.textContent = messageText;
-        messageList.appendChild(messageBox);
-        messageInput.value = "";  //after sending clear the input box
-        messageList.scrollTop = messageList.scrollHeight; //Auto Scroll
-    });
-
-    backToList.addEventListener("click", function(){
-        chatContent.classList.remove("chat-open");
-    });
-</script>
+<script type="module" src="chat-page.js"></script>
 </body>
 </html>

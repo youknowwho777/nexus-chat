@@ -119,6 +119,12 @@ body{
     transform:translateY(-2px);
 }
 
+.primary-btn:disabled{
+    cursor:not-allowed;
+    opacity:0.75;
+    transform:none;
+}
+
 .create-account-text{
     margin-top:18px;
     text-align:center;
@@ -204,63 +210,6 @@ body{
         </form>
     </div>
 </div>
-<script>
-    const loginForm = document.getElementById("login-form");
-    const email = document.getElementById("email");
-    const password = document.getElementById("password");
-    const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;  // REGEX Expression (w3schools)
-    let loginSubmitted = false;
-
-    function showError(input, message){
-        const errorText = document.getElementById(`${input.id}-error`);
-        input.classList.toggle("error", Boolean(message));
-        errorText.textContent = message;
-    }
-
-    function validateLogin(){
-        let isValid = true;
-        const emailValue = email.value.trim();
-        const passwordValue = password.value;
-
-        if(!emailValue){
-            showError(email, "Email is required.");
-            isValid = false;
-        }
-        else if(!emailPattern.test(emailValue)){
-            showError(email, "Enter a valid email address.");
-            isValid = false;
-        }
-        else{
-            showError(email, "");
-        }
-
-        if(!passwordValue){
-            showError(password, "Password is required.");
-            isValid = false;
-        }
-        else{
-            showError(password, "");
-        }
-
-        return isValid;
-    }
-
-    loginForm.addEventListener("submit", function(event){
-        event.preventDefault();  //prevents default browser action like reloading page for submission
-        loginSubmitted = true;
-
-        if(validateLogin()){
-            window.location.href = "../chat-page/chat-page.html";  //this tells to move to next page if evrything is correct
-        }
-    });
-
-    [email, password].forEach(function(input){   
-        input.addEventListener("input", function(){   //input event is triggered when text is changed.
-            if(loginSubmitted){
-                validateLogin();      //always validates when u make change in input.
-            }
-        });
-    });
-</script>
+<script type="module" src="login-page.js"></script>
 </body>
 </html>

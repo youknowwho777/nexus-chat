@@ -126,6 +126,12 @@ body{
     transform:translateY(-2px);
 }
 
+.primary-btn:disabled{
+    cursor:not-allowed;
+    opacity:0.75;
+    transform:none;
+}
+
 @media (max-width:600px){
 
     .create-account-page{
@@ -207,99 +213,7 @@ body{
     </div>
 </div>
 
-<script>
-    const createAccountForm = document.getElementById("create-account-form");
-    const username = document.getElementById("username");
-    const email = document.getElementById("email");
-    const password = document.getElementById("password");
-    const confirmPassword = document.getElementById("confirm-password");
-    let createAccountSubmitted = false;
-
-    const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    const usernamePattern = /^[A-Za-z0-9_]+$/;
-
-    function showError(input, message){
-        const errorText = document.getElementById(`${input.id}-error`);
-        input.classList.toggle("error", Boolean(message));
-        errorText.textContent = message;
-    }
-
-    function validateCreateAccount(){
-        let isValid = true;
-        const usernameValue = username.value.trim();
-        const emailValue = email.value.trim();
-        const passwordValue = password.value;
-        const confirmPasswordValue = confirmPassword.value;
-
-        if(usernameValue.length < 3){
-            showError(username, "Username must be at least 3 characters.");
-            isValid = false;
-        }
-        else if(!usernamePattern.test(usernameValue)){
-            showError(username, "Use only letters, numbers, and underscores.");
-            isValid = false;
-        }
-        else{
-            showError(username, "");
-        }
-
-        if(!emailValue){
-            showError(email, "Email is required.");
-            isValid = false;
-        }
-        else if(!emailPattern.test(emailValue)){
-            showError(email, "Enter a valid email address.");
-            isValid = false;
-        }
-        else{
-            showError(email, "");
-        }
-
-        if(passwordValue.length < 8){
-            showError(password, "Password must be at least 8 characters.");
-            isValid = false;
-        }
-        else if(!/[A-Za-z]/.test(passwordValue) || !/[0-9]/.test(passwordValue)){
-            showError(password, "Password must include letters and numbers.");
-            isValid = false;
-        }
-        else{
-            showError(password, "");
-        }
-
-        if(!confirmPasswordValue){
-            showError(confirmPassword, "Confirm your password.");
-            isValid = false;
-        }
-        else if(confirmPasswordValue !== passwordValue){
-            showError(confirmPassword, "Passwords do not match.");
-            isValid = false;
-        }
-        else{
-            showError(confirmPassword, "");
-        }
-
-        return isValid;
-    }
-
-    createAccountForm.addEventListener("submit", function(event){
-        event.preventDefault();
-        createAccountSubmitted = true;
-
-        if(validateCreateAccount()){
-            alert("Account created successfully!");
-            window.location.href = "login-page.html";
-        }
-    });
-
-    [username, email, password, confirmPassword].forEach(function(input){
-        input.addEventListener("input", function(){
-            if(createAccountSubmitted){
-                validateCreateAccount();
-            }
-        });
-    });
-</script>
+<script type="module" src="create-account.js"></script>
 </body>
 </html>
 
