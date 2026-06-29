@@ -7,6 +7,7 @@ const password = document.getElementById("password");
 
 let loginSubmitted = false;
 
+// Rules are kept in one object so validateFields can run all checks the same way.
 const loginFields = {
     email: {
         input: email,
@@ -49,7 +50,7 @@ function validateLogin(){
 }
 
 async function handleLogin(event){
-    event.preventDefault();
+    event.preventDefault(); // stops browser page reload on form submit
     loginSubmitted = true;
 
     if(!validateLogin()){
@@ -62,6 +63,7 @@ async function handleLogin(event){
     const response = await fakeServerRequest("Login successful.");
 
     if(response.success){
+        // Move to chat page only after validation and fake server success.
         window.location.href = "../chat-page/chat-page.html";
     }
 }
@@ -71,6 +73,7 @@ loginForm.addEventListener("submit", handleLogin);
 Object.values(loginFields).forEach(function(field){
     field.input.addEventListener("input", function(){
         if(loginSubmitted){
+            // After first submit, keep validating while user fixes typing.
             validateLogin();
         }
     });
