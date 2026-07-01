@@ -43,7 +43,7 @@ function getLoginFields(values){
   ];
 }
 
-export default function LoginPage({ onCreateAccountClick }){
+export default function LoginPage({ onCreateAccountClick, onLoginSuccess }){
   const form = useValidatedForm(initialValues, getLoginFields);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -58,7 +58,7 @@ export default function LoginPage({ onCreateAccountClick }){
     const response = await fakeServerRequest("Login successful.");
 
     if(response.success){
-      window.location.href = "/phase-1/chat-page/chat-page.html";
+      onLoginSuccess();
     }
   }
 
