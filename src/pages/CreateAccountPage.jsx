@@ -87,7 +87,7 @@ function getCreateAccountFields(values){
   ];
 }
 
-export default function CreateAccountPage({ onLoginClick }){
+export default function CreateAccountPage({ onAccountCreated, onLoginClick }){
   const form = useValidatedForm(initialValues, getCreateAccountFields);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -99,12 +99,23 @@ export default function CreateAccountPage({ onLoginClick }){
     }
 
     setIsSubmitting(true);
-    const response = await fakeServerRequest("Account created successfully!");
+    try {
+      const response = await fakeServerRequest("Account created successfully!");
 
-    if(response.success){
-      alert(response.message);
-      onLoginClick();
+      if(response.success){
+        onAccountCreated({
+          username: form.values.username.trim(),
+          email: form.values.email.trim()
+        });
+      }
+    } finally {
+      setIsSubmitting(false);
     }
+  }
+
+  function handleLoginClick(event){
+    event.preventDefault();
+    onLoginClick();
   }
 
   return (
@@ -169,6 +180,17 @@ export default function CreateAccountPage({ onLoginClick }){
           <PrimaryButton disabled={isSubmitting}>
             {isSubmitting ? "Creating..." : "Create Account"}
           </PrimaryButton>
+
+          <p className="mt-[18px] text-center text-gray-300 max-[600px]:leading-6">
+            Already have an account?{" "}
+            <a
+              href="/"
+              onClick={handleLoginClick}
+              className="font-semibold text-blue-400 no-underline hover:underline"
+            >
+              Login
+            </a>
+          </p>
         </form>
       </AuthCard>
     </AuthLayout>

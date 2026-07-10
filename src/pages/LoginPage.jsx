@@ -55,10 +55,16 @@ export default function LoginPage({ onCreateAccountClick, onLoginSuccess }){
     }
 
     setIsSubmitting(true);
-    const response = await fakeServerRequest("Login successful.");
+    try {
+      const response = await fakeServerRequest("Login successful.");
 
-    if(response.success){
-      onLoginSuccess();
+      if(response.success){
+        onLoginSuccess({
+          email: form.values.email.trim()
+        });
+      }
+    } finally {
+      setIsSubmitting(false);
     }
   }
 

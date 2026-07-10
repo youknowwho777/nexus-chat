@@ -1,121 +1,135 @@
 # Nexus Chat Progress
 
 ## Project Idea
-Nexus Chat is my first major project. I chose it because it connects the concepts I learned in 4 semesters: DBMS, Web Dev, OS, CN, and OOPS.
+Nexus Chat is my first major project. It connects concepts from DBMS, Web Development, OS, CN, and OOPS.
 
 ## Current Direction
-The project plan has changed from standalone HTML/Python prototypes to a full-stack chat application.
+The project started as standalone HTML/CSS/JavaScript pages and is now moving toward a full-stack chat application.
 
-Canonical workflow: see `PROJECT_PLAN.md`.
-
-Current prototype naming convention: use lowercase kebab-case for folders, files, classes, and ids.
+Main reference: `PROJECT_PLAN.md`
 
 Target stack:
-- Frontend: Vite, React, Tailwind CSS, DaisyUI, Zustand, Socket.IO client.
+- Frontend: Vite, React, Tailwind CSS, React Router.
 - Backend: Node.js, Express, MongoDB Atlas, Mongoose, JWT auth, bcrypt, Socket.IO.
 
-## Learning Style
-Build while learning. Do not rush or copy blindly. For every feature, understand what we built, why it works, and which concept it connects to.
-
-## Overall Parts To Build
-- Frontend structure: login page, create account page, chat page, settings page, and clean navigation between pages.
-- Responsive design: make all pages work properly on phone, tablet, laptop, and desktop screen sizes.
-- CSS organization: clean repeated CSS and later move common styling into separate CSS files.
-- JavaScript frontend behavior: validate forms, handle button clicks, switch chats, show/hide mobile chat screens, and prepare data to send to the backend.
-- Backend basics: connect the frontend to Python server code and understand how client-server communication works.
-- Database: store users, login details, chats, and messages using DBMS concepts.
-- Real chat system: send and receive messages using networking concepts, possibly sockets.
-- OOPS structure: organize users, messages, chats, and server logic using classes and clean code.
-- Final polish: improve UI, settings features, theme/profile options, logout, and project documentation.
+## Learning Rule
+Build while learning. Understand what was built, why it works, and which concept it connects to.
 
 ## Day 1
 HTML/CSS frontend basics.
 
 Done:
-- Built login, create account, chat, and settings page layouts.
-- Improved responsiveness and fixed small navigation/text issues.
+- Built login page layout.
+- Built create account page layout.
+- Built chat page layout.
+- Built settings page layout.
+- Improved basic navigation and text.
 
 ## Day 2
 HTML/CSS verification.
 
 Done:
 - Tested pages on different screen sizes.
-- Verified layout, responsiveness, and basic page styling.
+- Improved responsive layout behavior.
+- Checked basic styling and spacing.
 
 ## Day 3
-JavaScript form validation for login and create account pages.
+JavaScript form validation.
 
 Done:
-- Added frontend validation for login/create account forms.
-- Checked basic input rules and user feedback behavior.
+- Added validation for login form.
+- Added validation for create account form.
+- Added basic input rules.
+- Added user feedback for invalid inputs.
 
 ## Day 4
 Chat page JavaScript basics.
 
 Done:
 - Added chat search filtering.
-- Added chat selection and message display.
+- Added chat selection.
+- Added message display.
 - Added temporary frontend-only message sending.
 
 ## Day 5
 Git and GitHub setup.
 
 Done:
-- Created the GitHub repository for Nexus Chat.
-- Initialized the project with git.
-- Made the first push to the remote repository.
-- Started tracking project progress and code changes properly.
+- Created the GitHub repository.
+- Initialized git in the project.
+- Made the first push.
+- Started tracking progress and code changes.
 
 ## Day 6
 Advanced JavaScript learning.
 
 Done:
-- Spent time learning a few advanced JavaScript topics.
-- Connected the concepts back to how they can help in the Nexus Chat project.
+- Studied advanced JavaScript topics.
+- Connected the concepts to Nexus Chat features.
 
 ## Day 7
 Advanced JavaScript learning continued.
 
 Done:
-- Continued studying advanced JavaScript topics.
-- Practiced understanding concepts before adding more project features.
+- Continued studying advanced JavaScript.
+- Focused on understanding concepts before adding more features.
 
 ## Day 8
-Understanding advanced JavaScript changes in the project.
+Advanced JavaScript project review.
 
 Done:
-- Connected recently learned JavaScript topics to the Nexus Chat files.
-- Started understanding how objects can organize chat data and form validation rules.
-- Started understanding how modules split page logic into separate reusable files.
-- Reviewed how promises, async functions, and await can prepare the project for future server communication.
-- Verified the updated files through a local server before debugging.
+- Reviewed how objects organize chat data.
+- Reviewed how validation rules can be stored cleanly.
+- Reviewed how modules split code into reusable files.
+- Reviewed promises, async functions, and await.
+- Checked the updated files with a local server.
 
 ## Day 9
-Started the slow migration from the HTML/CSS/JavaScript prototype into a React + Tailwind CSS application.
+Started React + Tailwind migration.
 
 Done:
-- Added a Vite + React + Tailwind CSS setup at the project root.
-- Converted the login page into React functional components.
-- Converted the create account page into React functional components.
-- Replaced DOM-based form validation with React state, hooks, reusable validation utilities, and event handlers.
-- Split auth UI into reusable pieces: auth layout, auth card, form input, and primary button.
-- Moved React auth images into `src/assets/images/auth`.
-- Created a cleaner scalable source structure with `components`, `pages`, `layouts`, `assets`, `styles`, `hooks`, `context`, `utils`, `data`, and `services`.
-- Moved the old HTML/CSS/JavaScript prototype into `public/phase-1` so it remains available as a reference and can still be served by Vite.
-- Updated the React login success redirect to the archived phase-1 chat page.
-- Verified the React app with a production Vite build.
+- Added Vite + React + Tailwind CSS setup.
+- Converted login page into React components.
+- Converted create account page into React components.
+- Replaced DOM form validation with React state and hooks.
+- Added reusable auth components.
+- Moved auth images into `src/assets/images/auth`.
+- Created a cleaner `src` folder structure.
+- Moved old HTML/CSS/JS prototype into `public/phase-1`.
+- Verified the React app with a production build.
 
 ## Day 10
-Frontend Phase 2: continued the React + Tailwind CSS migration.
+Continued React frontend migration.
 
 Done:
-- Converted the chat page and settings page into React components.
-- Added React state, hooks, data binding, chat search, chat selection, and message sending.
+- Converted chat page into a React component.
+- Converted settings page into a React component.
+- Added React state and hooks for chat behavior.
+- Added chat search, chat selection, and message sending.
 - Updated login navigation to open the React chat page.
-- Verified the app with a production Vite build.
+- Verified the app with a production build.
+
+## Day 11
+Completed main React frontend pass.
+
+Done:
+- Added React Router routes.
+- Added protected routes for chat and settings.
+- Added localStorage-backed mock session.
+- Added localStorage-backed chat and settings state.
+- Finished controlled state for login and signup.
+- Finished controlled state for chat, profile settings, theme, background, and AI preference.
+- Removed broken encoded symbols from React pages.
+- Added `.vite/` to `.gitignore`.
+- Verified the app with a production build.
+
+## Current State
+The React frontend prototype is mostly ready for backend integration. Data is still stored locally or mocked.
 
 ## Next Work
-- Review the new React auth files step by step.
-- Review the new React chat and settings files step by step.
-- Replace temporary browser navigation with a proper routing approach when more pages are migrated.
-- Add backend folders and API services when authentication moves beyond fake frontend requests.
+- Create backend folders and Express server.
+- Add authentication APIs.
+- Connect MongoDB with Mongoose models.
+- Replace mock frontend logic with real API calls.
+- Add Socket.IO for real-time chat.
+- Persist users, settings, chats, and messages in the database.

@@ -1,26 +1,66 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { initialChats, sendMessageAsync } from "../data/chats.js";
+import { sendMessageAsync } from "../data/chats.js";
 
-const chatBackground = "/phase-1/chat-page/chat-background.png";
+const backgrounds = {
+  space: "/phase-1/chat-page/chat-background.png",
+  login: "/phase-1/login-page/login-background.png",
+  aurora: "/phase-1/login-page/alternate-background.png"
+};
+
 const chatLogo = "/phase-1/chat-page/chat-logo.png";
 
-function ProfileMark({ className = "" }){
+const themeStyles = {
+  blue: {
+    sent: "bg-[#2563eb]",
+    active: "bg-[rgba(77,140,255,0.22)]",
+    mark: "from-[#4da3ff] to-[#8a5cff]"
+  },
+  green: {
+    sent: "bg-[#0f766e]",
+    active: "bg-[rgba(45,212,191,0.20)]",
+    mark: "from-[#2dd4bf] to-[#22c55e]"
+  },
+  rose: {
+    sent: "bg-[#be185d]",
+    active: "bg-[rgba(244,114,182,0.20)]",
+    mark: "from-[#fb7185] to-[#a855f7]"
+  }
+};
+
+function ProfileMark({ className = "", label = "", themeStyle }){
+  const initials = label
+    .split(" ")
+    .map(function(part){
+      return part.charAt(0);
+    })
+    .join("")
+    .slice(0, 2)
+    .toUpperCase();
+
   return (
     <div
-      className={`aspect-square flex-shrink-0 rounded-full bg-gradient-to-br from-[#4da3ff] to-[#8a5cff] ${className}`}
+      className={`flex aspect-square flex-shrink-0 items-center justify-center rounded-full bg-gradient-to-br ${themeStyle.mark} ${className} text-sm font-bold text-white`}
       aria-hidden="true"
-    />
+    >
+      {initials || "N"}
+    </div>
   );
 }
 
-export default function ChatPage({ onSettingsClick }){
-  const [chats, setChats] = useState(initialChats);
+export default function ChatPage({
+  chats,
+  settings,
+  setChats,
+  onSettingsClick
+}){
   const [activeChat, setActiveChat] = useState("");
   const [searchText, setSearchText] = useState("");
   const [messageText, setMessageText] = useState("");
   const [isSending, setIsSending] = useState(false);
   const [isMobileChatOpen, setIsMobileChatOpen] = useState(false);
   const messageListRef = useRef(null);
+  const themeStyle = themeStyles[settings.theme] || themeStyles.blue;
+  const backgroundImage = backgrounds[settings.background] || backgrounds.space;
 
   const chatNames = useMemo(function(){
     const normalizedSearch = searchText.trim().toLowerCase();
@@ -34,6 +74,13 @@ export default function ChatPage({ onSettingsClick }){
   }, [chats, searchText]);
 
   const selectedChat = activeChat ? chats[activeChat] : null;
+
+  useEffect(function(){
+    if(activeChat && !chats[activeChat]){
+      setActiveChat("");
+      setIsMobileChatOpen(false);
+    }
+  }, [activeChat, chats]);
 
   useEffect(function(){
     if(messageListRef.current){
@@ -58,21 +105,29 @@ export default function ChatPage({ onSettingsClick }){
 
     setMessageText("");
     setIsSending(true);
-    const sentMessage = await sendMessageAsync(trimmedMessage);
 
-    setChats(function(currentChats){
-      const currentChat = currentChats[targetChat];
+    try {
+      const sentMessage = await sendMessageAsync(trimmedMessage);
 
-      return {
-        ...currentChats,
-        [targetChat]: {
-          ...currentChat,
-          preview: sentMessage.text,
-          messages: [...currentChat.messages, sentMessage]
+      setChats(function(currentChats){
+        const currentChat = currentChats[targetChat];
+
+        if(!currentChat){
+          return currentChats;
         }
-      };
-    });
-    setIsSending(false);
+
+        return {
+          ...currentChats,
+          [targetChat]: {
+            ...currentChat,
+            preview: sentMessage.text,
+            messages: [...currentChat.messages, sentMessage]
+          }
+        };
+      });
+    } finally {
+      setIsSending(false);
+    }
   }
 
   function handleSettingsClick(event){
@@ -83,7 +138,7 @@ export default function ChatPage({ onSettingsClick }){
   return (
     <div
       className="relative min-h-screen overflow-hidden bg-cover bg-center bg-no-repeat font-sans text-white before:absolute before:inset-0 before:bg-[rgba(3,8,20,0.55)] before:content-['']"
-      style={{ backgroundImage: `url(${chatBackground})` }}
+      style={{ backgroundImage: `url(${backgroundImage})` }}
     >
       <div className="relative z-10 flex h-[100dvh] min-h-screen flex-col">
         <header className="flex min-h-[72px] items-center justify-between gap-[18px] border-b border-white/10 bg-[rgba(5,15,35,0.55)] px-[clamp(14px,3vw,25px)] backdrop-blur-[15px] max-[700px]:min-h-[68px]">
@@ -103,9 +158,21 @@ export default function ChatPage({ onSettingsClick }){
             onClick={handleSettingsClick}
             aria-label="Open settings"
             title="Settings"
-            className="flex h-[45px] w-[45px] flex-shrink-0 items-center justify-center rounded-full bg-white/10 text-[22px] text-white no-underline transition duration-300 hover:rotate-[60deg] hover:bg-white/15 max-[380px]:h-10 max-[380px]:w-10 max-[380px]:text-[19px]"
+            className="group flex h-[45px] w-[45px] flex-shrink-0 items-center justify-center rounded-full bg-white/10 text-white no-underline transition duration-300 hover:bg-white/15 max-[380px]:h-10 max-[380px]:w-10"
           >
-            ⚙
+            <svg
+              viewBox="0 0 24 24"
+              aria-hidden="true"
+              className="h-5 w-5 transition-transform duration-300 group-hover:rotate-[30deg]"
+              fill="none"
+              stroke="currentColor"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth="2"
+            >
+              <path d="M12 15.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7Z" />
+              <path d="M19.4 15a1.7 1.7 0 0 0 .34 1.88l.05.05a2.05 2.05 0 0 1-2.9 2.9l-.05-.05A1.7 1.7 0 0 0 15 19.4a1.7 1.7 0 0 0-1 1.55V21a2 2 0 0 1-4 0v-.08a1.7 1.7 0 0 0-1-1.55 1.7 1.7 0 0 0-1.88.34l-.05.05a2.05 2.05 0 0 1-2.9-2.9l.05-.05A1.7 1.7 0 0 0 4.6 15a1.7 1.7 0 0 0-1.55-1H3a2 2 0 0 1 0-4h.08a1.7 1.7 0 0 0 1.55-1 1.7 1.7 0 0 0-.34-1.88l-.05-.05a2.05 2.05 0 0 1 2.9-2.9l.05.05A1.7 1.7 0 0 0 9 4.6a1.7 1.7 0 0 0 1-1.55V3a2 2 0 0 1 4 0v.08a1.7 1.7 0 0 0 1 1.55 1.7 1.7 0 0 0 1.88-.34l.05-.05a2.05 2.05 0 0 1 2.9 2.9l-.05.05A1.7 1.7 0 0 0 19.4 9c.22.6.8 1 1.55 1H21a2 2 0 0 1 0 4h-.08a1.7 1.7 0 0 0-1.55 1Z" />
+            </svg>
           </a>
         </header>
 
@@ -128,6 +195,7 @@ export default function ChatPage({ onSettingsClick }){
               {chatNames.map(function(name){
                 const chat = chats[name];
                 const isActive = activeChat === name;
+                const displayName = name === "Siddu" ? `${settings.displayName} (You)` : name;
 
                 return (
                   <button
@@ -136,12 +204,16 @@ export default function ChatPage({ onSettingsClick }){
                     onClick={function(){
                       handleChatSelect(name);
                     }}
-                    className={`mb-2 flex w-full min-w-0 cursor-pointer items-center gap-3 rounded-[14px] border-0 p-3 text-left text-white transition duration-300 hover:translate-x-[3px] hover:bg-white/10 max-[380px]:p-2.5 ${isActive ? "bg-[rgba(77,140,255,0.22)]" : "bg-transparent"}`}
+                    className={`mb-2 flex w-full min-w-0 cursor-pointer items-center gap-3 rounded-[14px] border-0 p-3 text-left text-white transition duration-300 hover:translate-x-[3px] hover:bg-white/10 max-[380px]:p-2.5 ${isActive ? themeStyle.active : "bg-transparent"}`}
                   >
-                    <ProfileMark className="w-[50px] max-[380px]:w-11" />
+                    <ProfileMark
+                      className="w-[50px] max-[380px]:w-11"
+                      label={displayName}
+                      themeStyle={themeStyle}
+                    />
                     <div className="min-w-0">
                       <h4 className="mb-1 overflow-hidden text-ellipsis whitespace-nowrap text-base font-semibold">
-                        {name === "Siddu" ? "Siddu (You)" : name}
+                        {displayName}
                       </h4>
                       <p className="overflow-hidden text-ellipsis whitespace-nowrap text-[0.85rem] text-[#c2c9d9]">
                         {chat.preview}
@@ -150,6 +222,12 @@ export default function ChatPage({ onSettingsClick }){
                   </button>
                 );
               })}
+
+              {chatNames.length === 0 ? (
+                <p className="px-3 py-6 text-center text-sm text-[#c2c9d9]">
+                  No chats match your search.
+                </p>
+              ) : null}
             </div>
           </aside>
 
@@ -178,9 +256,13 @@ export default function ChatPage({ onSettingsClick }){
                     }}
                     className="hidden h-10 w-10 flex-shrink-0 items-center justify-center rounded-full border-0 bg-white/10 text-lg text-white max-[700px]:flex"
                   >
-                    ←
+                    &lt;
                   </button>
-                  <ProfileMark className="w-[50px]" />
+                  <ProfileMark
+                    className="w-[50px]"
+                    label={activeChat}
+                    themeStyle={themeStyle}
+                  />
                   <div className="min-w-0 text-left">
                     <h3 className="mb-[3px] text-[1.1rem] font-semibold">
                       {activeChat}
@@ -200,8 +282,8 @@ export default function ChatPage({ onSettingsClick }){
 
                     return (
                       <div
-                        key={`${message.type}-${message.text}-${index}`}
-                        className={`max-w-[min(75%,520px)] rounded-[14px] px-3.5 py-3 text-left leading-[1.4] ${isSent ? "self-end bg-[#2563eb]" : "self-start bg-white/10"}`}
+                        key={message.id || `${message.type}-${message.text}-${index}`}
+                        className={`max-w-[min(75%,520px)] rounded-[14px] px-3.5 py-3 text-left leading-[1.4] ${isSent ? `self-end ${themeStyle.sent}` : "self-start bg-white/10"}`}
                       >
                         {message.text}
                       </div>
@@ -228,9 +310,9 @@ export default function ChatPage({ onSettingsClick }){
                     disabled={isSending || !messageText.trim()}
                     aria-label="Send message"
                     title="Send"
-                    className="w-12 rounded-xl border-0 bg-[#2563eb] text-[17px] text-white disabled:cursor-not-allowed disabled:opacity-75"
+                    className={`w-14 rounded-xl border-0 ${themeStyle.sent} text-[12px] font-bold text-white disabled:cursor-not-allowed disabled:opacity-75`}
                   >
-                    ➤
+                    SEND
                   </button>
                 </form>
               </div>

@@ -45,9 +45,15 @@ export function sendMessageAsync(text){
   return new Promise(function(resolve){
     setTimeout(function(){
       resolve({
+        id: window.crypto?.randomUUID?.() || String(Date.now()),
         text: text,
-        type: "sent"
+        type: "sent",
+        createdAt: new Date().toISOString()
       });
     }, 250);
   });
+}
+
+export function createInitialChats(){
+  return structuredClone(initialChats);
 }

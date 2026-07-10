@@ -1,84 +1,196 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
+import {
+  BrowserRouter,
+  Navigate,
+  Route,
+  Routes,
+  useNavigate
+} from "react-router-dom";
+import { createInitialChats } from "./data/chats.js";
 import ChatPage from "./pages/ChatPage.jsx";
 import CreateAccountPage from "./pages/CreateAccountPage.jsx";
 import LoginPage from "./pages/LoginPage.jsx";
 import SettingsPage from "./pages/SettingsPage.jsx";
 
-function getCurrentPage(){
-  const path = window.location.pathname;
+const storageKeys = {
+  user: "nexus:user",
+  chats: "nexus:chats",
+  settings: "nexus:settings"
+};
 
-  if(path.includes("create-account")){
-    return "create-account";
+const defaultSettings = {
+  displayName: "Siddu",
+  email: "siddu@nexus.dev",
+  theme: "blue",
+  background: "space",
+  aiAssistant: true
+};
+
+function readStorage(key, fallback){
+  try {
+    const savedValue = window.localStorage.getItem(key);
+    return savedValue ? JSON.parse(savedValue) : fallback;
+  } catch {
+    return fallback;
   }
-
-  if(path.includes("settings")){
-    return "settings";
-  }
-
-  if(path.includes("chat")){
-    return "chat";
-  }
-
-  return "login";
 }
 
-export default function App(){
-  const [page, setPage] = useState(getCurrentPage);
+function writeStorage(key, value){
+  window.localStorage.setItem(key, JSON.stringify(value));
+}
+
+function ProtectedRoute({ currentUser, children }){
+  if(!currentUser){
+    return <Navigate to="/" replace />;
+  }
+
+  return children;
+}
+
+function AppRoutes(){
+  const navigate = useNavigate();
+  const [currentUser, setCurrentUser] = useState(function(){
+    return readStorage(storageKeys.user, null);
+  });
+  const [chats, setChats] = useState(function(){
+    return readStorage(storageKeys.chats, createInitialChats());
+  });
+  const [settings, setSettings] = useState(function(){
+    return {
+      ...defaultSettings,
+      ...readStorage(storageKeys.settings, {})
+    };
+  });
 
   useEffect(function(){
-    function handlePopState(){
-      setPage(getCurrentPage());
+    if(currentUser){
+      writeStorage(storageKeys.user, currentUser);
+      return;
     }
 
-    window.addEventListener("popstate", handlePopState);
+    window.localStorage.removeItem(storageKeys.user);
+  }, [currentUser]);
 
-    return function(){
-      window.removeEventListener("popstate", handlePopState);
+  useEffect(function(){
+    writeStorage(storageKeys.chats, chats);
+  }, [chats]);
+
+  useEffect(function(){
+    writeStorage(storageKeys.settings, settings);
+  }, [settings]);
+
+  function handleLoginSuccess(userDetails){
+    const nextUser = {
+      name: settings.displayName,
+      email: userDetails.email
     };
-  }, []);
 
-  const navigation = useMemo(function(){
-    return {
-      goToLogin: function(){
-        window.history.pushState({}, "", "/");
-        setPage("login");
-      },
-      goToCreateAccount: function(){
-        window.history.pushState({}, "", "/create-account");
-        setPage("create-account");
-      },
-      goToChat: function(){
-        window.history.pushState({}, "", "/chat");
-        setPage("chat");
-      },
-      goToSettings: function(){
-        window.history.pushState({}, "", "/settings");
-        setPage("settings");
+    setCurrentUser(nextUser);
+    setSettings(function(currentSettings){
+      return {
+        ...currentSettings,
+        email: userDetails.email
+      };
+    });
+    navigate("/chat");
+  }
+
+  function handleAccountCreated(userDetails){
+    setSettings(function(currentSettings){
+      return {
+        ...currentSettings,
+        displayName: userDetails.username,
+        email: userDetails.email
+      };
+    });
+    navigate("/");
+  }
+
+  function handleSettingsChange(nextSettings){
+    setSettings(nextSettings);
+    setCurrentUser(function(user){
+      if(!user){
+        return user;
       }
-    };
-  }, []);
 
-  if(page === "chat"){
-    return <ChatPage onSettingsClick={navigation.goToSettings} />;
+      return {
+        ...user,
+        name: nextSettings.displayName,
+        email: nextSettings.email
+      };
+    });
   }
 
-  if(page === "settings"){
-    return (
-      <SettingsPage
-        onBackClick={navigation.goToChat}
-        onLogoutClick={navigation.goToLogin}
-      />
-    );
-  }
-
-  if(page === "create-account"){
-    return <CreateAccountPage onLoginClick={navigation.goToLogin} />;
+  function handleLogout(){
+    setCurrentUser(null);
+    navigate("/");
   }
 
   return (
-    <LoginPage
-      onCreateAccountClick={navigation.goToCreateAccount}
-      onLoginSuccess={navigation.goToChat}
-    />
+    <Routes>
+      <Route
+        path="/"
+        element={
+          <LoginPage
+            onCreateAccountClick={function(){
+              navigate("/create-account");
+            }}
+            onLoginSuccess={handleLoginSuccess}
+          />
+        }
+      />
+      <Route
+        path="/create-account"
+        element={
+          <CreateAccountPage
+            onAccountCreated={handleAccountCreated}
+            onLoginClick={function(){
+              navigate("/");
+            }}
+          />
+        }
+      />
+      <Route
+        path="/chat"
+        element={
+          <ProtectedRoute currentUser={currentUser}>
+            <ChatPage
+              chats={chats}
+              currentUser={currentUser}
+              settings={settings}
+              setChats={setChats}
+              onSettingsClick={function(){
+                navigate("/settings");
+              }}
+            />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/settings"
+        element={
+          <ProtectedRoute currentUser={currentUser}>
+            <SettingsPage
+              currentUser={currentUser}
+              settings={settings}
+              onSettingsChange={handleSettingsChange}
+              onBackClick={function(){
+                navigate("/chat");
+              }}
+              onLogoutClick={handleLogout}
+            />
+          </ProtectedRoute>
+        }
+      />
+      <Route path="*" element={<Navigate to={currentUser ? "/chat" : "/"} replace />} />
+    </Routes>
+  );
+}
+
+export default function App(){
+  return (
+    <BrowserRouter>
+      <AppRoutes />
+    </BrowserRouter>
   );
 }
