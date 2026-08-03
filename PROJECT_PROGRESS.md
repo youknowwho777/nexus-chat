@@ -127,9 +127,7 @@ Done:
 The React frontend prototype is mostly ready for backend integration. Data is still stored locally or mocked.
 
 ## Next Work
-- Create backend folders and Express server.
-- Add authentication APIs.
-- Connect MongoDB with Mongoose models.
-- Replace mock frontend logic with real API calls.
-- Add Socket.IO for real-time chat.
-- Persist users, settings, chats, and messages in the database.
+- Start backend with only Node.js + Express.js.
+- Create basic Express server and test route: `GET /api/health`.
+- Add simple login and create-account routes with temporary in-memory arrays.
+- Connect React login/signup forms to Express using `fetch`.

@@ -7,26 +7,26 @@ import { useValidatedForm } from "../hooks/useValidatedForm.js";
 import { fakeServerRequest, patterns } from "../utils/validation.js";
 import { useState } from "react";
 
-const initialValues = {
+const initialValues = { // s  tore initial form values
   email: "",
   password: ""
 };
 
-function getLoginFields(values){
-  return [
+function getLoginFields(values){ //values is an object of email and password from the input fields
+  return [ //returns an array of objects (EmailObject , PassObject)
     {
       name: "email",
       value: values.email.trim(),
-      rules: [
+      rules: [ // array stores validation rules 2 objects with 2 messages 
         {
           test: Boolean,
           message: "Email is required."
         },
         {
           test: function(value){
-            return patterns.email.test(value);
+            return patterns.email.test(value); //regex pattern buil-in function 
           },
-          message: "Enter a valid email address."
+          message: "Enter a valid email address." 
         }
       ]
     },
@@ -42,33 +42,41 @@ function getLoginFields(values){
     }
   ];
 }
+//LoginFields() does not validate the form.
+// It only describes the fields and their validation rules.
 
 export default function LoginPage({ onCreateAccountClick, onLoginSuccess }){
-  const form = useValidatedForm(initialValues, getLoginFields);
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  
+  
+  const form = useValidatedForm(initialValues, getLoginFields); //returns an object see this in other file 
+  const [isSubmitting, setIsSubmitting] = useState(false); //stores login requests running or not
 
   async function handleSubmit(event){
+     // browser refreshes the form and sends data when submitted 
+     //so stop that action
     event.preventDefault();
 
     if(!form.submit()){
-      return;
+      return;  // validation failed so dont run below code  
     }
 
-    setIsSubmitting(true);
+    setIsSubmitting(true); // disable button means valid so logging starts
     try {
       const response = await fakeServerRequest("Login successful.");
+      //pretends to send data to server and it returns response
+      //cause we didn't connect backend yet
 
       if(response.success){
-        onLoginSuccess({
+        onLoginSuccess({  //sends that login is succss and email to parent
           email: form.values.email.trim()
         });
       }
-    } finally {
-      setIsSubmitting(false);
+    } finally { //back to normal make issubmitted false
+      setIsSubmitting(false); //enable button
     }
   }
 
-  function handleCreateAccountClick(event){
+  function handleCreateAccountClick(event){ //handle clickicking createaccount 
     event.preventDefault();
     onCreateAccountClick();
   }
@@ -88,7 +96,8 @@ export default function LoginPage({ onCreateAccountClick, onLoginSuccess }){
             error={form.errors.email}
             placeholder="Email"
             autoComplete="email"
-            onChange={function(event){
+            //for every change we update form values too 
+            onChange={function(event){ //data bindiing 
               form.updateField("email", event.target.value);
             }}
           />
@@ -106,7 +115,7 @@ export default function LoginPage({ onCreateAccountClick, onLoginSuccess }){
           />
 
           <PrimaryButton disabled={isSubmitting}>
-            {isSubmitting ? "Logging in..." : "Login"}
+            {isSubmitting ? "Logging in..." : "Login"} 
           </PrimaryButton>
 
           <p className="mt-[18px] text-center text-gray-300 max-[600px]:leading-6">

@@ -7,11 +7,12 @@ import createAccountBackground from "../assets/images/auth/create-account-backgr
 import { useValidatedForm } from "../hooks/useValidatedForm.js";
 import { fakeServerRequest, patterns } from "../utils/validation.js";
 
+// 85% similar to login page
 const initialValues = {
   username: "",
   email: "",
   password: "",
-  confirmPassword: ""
+  confirmPassword: ""  
 };
 
 function getCreateAccountFields(values){
@@ -94,7 +95,7 @@ export default function CreateAccountPage({ onAccountCreated, onLoginClick }){
   async function handleSubmit(event){
     event.preventDefault();
 
-    if(!form.submit()){
+    if(!form.submit()){ //if from is not valid then dont run the below success code 
       return;
     }
 

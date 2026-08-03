@@ -18,7 +18,7 @@ const storageKeys = {
   settings: "nexus:settings"
 };
 
-const defaultSettings = {
+const defaultSettings = { // local Storage default values
   displayName: "Siddu",
   email: "siddu@nexus.dev",
   theme: "blue",
@@ -26,7 +26,7 @@ const defaultSettings = {
   aiAssistant: true
 };
 
-function readStorage(key, fallback){
+function readStorage(key, fallback){ //helper function to read from local storage
   try {
     const savedValue = window.localStorage.getItem(key);
     return savedValue ? JSON.parse(savedValue) : fallback;
@@ -35,7 +35,7 @@ function readStorage(key, fallback){
   }
 }
 
-function writeStorage(key, value){
+function writeStorage(key, value){  //to write everything
   window.localStorage.setItem(key, JSON.stringify(value));
 }
 

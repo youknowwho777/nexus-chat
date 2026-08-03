@@ -1,3 +1,6 @@
+//Initial chats database type : 
+//stores as obejcts easier to acesss than arrays
+//each message : name, preview, text, type 
 export const initialChats = {
   Max: {
     status: "Online",
@@ -41,11 +44,13 @@ export const initialChats = {
   }
 };
 
-export function sendMessageAsync(text){
-  return new Promise(function(resolve){
-    setTimeout(function(){
+ //for sending messages makes clear when we have a backend
+export function sendMessageAsync(text){ 
+  return new Promise(function(resolve){ //takes text and returns a promise
+    setTimeout(function(){  //just a fake delay to make it realistic
       resolve({
         id: window.crypto?.randomUUID?.() || String(Date.now()),
+        //the above syntax is Optimal Chaining lets study later
         text: text,
         type: "sent",
         createdAt: new Date().toISOString()
@@ -54,6 +59,8 @@ export function sendMessageAsync(text){
   });
 }
 
-export function createInitialChats(){
+export function createInitialChats(){ 
+   //this send copy of initial chats to app.js not to chatpage  
+  //that way editing it  will not effect 
   return structuredClone(initialChats);
 }

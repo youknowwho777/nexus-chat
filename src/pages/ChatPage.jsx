@@ -1,6 +1,11 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { sendMessageAsync } from "../data/chats.js";
 
+//What chat page Does?
+//whole chat page (mobile/laptop verisons),chats ,searching names
+//showing and sending messages too
+//themes and settings  
+
 const backgrounds = {
   space: "/phase-1/chat-page/chat-background.png",
   login: "/phase-1/login-page/login-background.png",
@@ -27,112 +32,137 @@ const themeStyles = {
   }
 };
 
+//ProfileMark component : for creating avatar for each friend
+
 function ProfileMark({ className = "", label = "", themeStyle }){
+  //size,name,theme passed as props
+  //those props says 
+  //const className= props.slassName || "" 
+  // (cause instead of undefined it uses "") same for label too
   const initials = label
-    .split(" ")
+  //take name sepreate first chars take at max 2 and keep it as short name
+    .split(" ") 
     .map(function(part){
-      return part.charAt(0);
+      return part.charAt(0);  
     })
-    .join("")
-    .slice(0, 2)
+    .join("")  
+    .slice(0, 2)  
     .toUpperCase();
+    //Ex: siddu => S   Rishi Chand ==> RS   the boy who lived ==>TB
 
   return (
     <div
       className={`flex aspect-square flex-shrink-0 items-center justify-center rounded-full bg-gradient-to-br ${themeStyle.mark} ${className} text-sm font-bold text-white`}
       aria-hidden="true"
     >
-      {initials || "N"}
+      {initials || "N"} 
     </div>
   );
 }
 
-export default function ChatPage({
-  chats,
-  settings,
-  setChats,
-  onSettingsClick
+export default function ChatPage({ //all the props from parent (App.jsx)
+  chats,  // chat Data
+  settings, //user preferred theme,background,name 
+  setChats, //update chats (react doesnt update states directly)
+  onSettingsClick  //handle clicking settings from parent
 }){
+  //all useStates: for  STORING changing values
   const [activeChat, setActiveChat] = useState("");
   const [searchText, setSearchText] = useState("");
   const [messageText, setMessageText] = useState("");
   const [isSending, setIsSending] = useState(false);
   const [isMobileChatOpen, setIsMobileChatOpen] = useState(false);
-  const messageListRef = useRef(null);
-  const themeStyle = themeStyles[settings.theme] || themeStyles.blue;
-  const backgroundImage = backgrounds[settings.background] || backgrounds.space;
+  
+  const messageListRef = useRef(null); //for scrolling down when a new message arrives
+  const themeStyle = themeStyles[settings.theme] || themeStyles.blue;  //this stores the selected themestyle orelse default
 
-  const chatNames = useMemo(function(){
+  const backgroundImage = backgrounds[settings.background] || backgrounds.space; //same as above
+
+  const chatNames = useMemo(function(){ 
     const normalizedSearch = searchText.trim().toLowerCase();
-
+    //returns the list of matching names/previews
     return Object.keys(chats).filter(function(name){
       const chat = chats[name];
-
+      //now if we search either the name or the latest message(preview) then this gives true 
       return name.toLowerCase().includes(normalizedSearch)
         || chat.preview.toLowerCase().includes(normalizedSearch);
     });
-  }, [chats, searchText]);
+  }, [chats, searchText]);  
+  //does the filtering function only when chats or searchChats changes
 
-  const selectedChat = activeChat ? chats[activeChat] : null;
+  const selectedChat = activeChat ? chats[activeChat] : null; 
+  //tells which object to display right i mean selected chat=>stores entire that chat
 
   useEffect(function(){
     if(activeChat && !chats[activeChat]){
-      setActiveChat("");
-      setIsMobileChatOpen(false);
-    }
-  }, [activeChat, chats]);
+    //"If a chat is currently selected, 
+    // but that chat no longer exists in the chats object.
 
-  useEffect(function(){
-    if(messageListRef.current){
+      setActiveChat("");  //set activechat to ""
+      setIsMobileChatOpen(false);  //if we are in mobile version set this false
+    }
+  }, [activeChat, chats]); 
+
+  useEffect(function(){ //this handles the auto Scroll
+    if(messageListRef.current){  // says if auto scroll required or not when rendered 
       messageListRef.current.scrollTop = messageListRef.current.scrollHeight;
+      //built in DOM props=> scrollTop, scrollHeight==Toatl height of messages
     }
   }, [activeChat, selectedChat?.messages.length]);
+  //dependcy array is opened a new chat  or  a new message is added(length changes)
 
-  function handleChatSelect(name){
+  function handleChatSelect(name){ //Now this is called when selected a chat
     setActiveChat(name);
-    setIsMobileChatOpen(true);
+    setIsMobileChatOpen(true);//if we are in mobile version this is needed
   }
 
   async function handleMessageSubmit(event){
-    event.preventDefault();
+    event.preventDefault(); //when clicked send it  refereshes page dont do that
 
-    const trimmedMessage = messageText.trim();
+    //store the message and the chat name cause during waiting if user changes ?
+    //for Data Consistency 
+    const trimmedMessage = messageText.trim(); 
     const targetChat = activeChat;
 
     if(!trimmedMessage || !targetChat || isSending){
+      //means no message or no active chat or sending another message 
       return;
     }
 
-    setMessageText("");
-    setIsSending(true);
+    setMessageText("");//clear input box 
+    setIsSending(true);//lock the sending (prevents multiple clicks)
 
     try {
       const sentMessage = await sendMessageAsync(trimmedMessage);
+      //this above is done in backend but for now in chats.js
 
-      setChats(function(currentChats){
+      setChats(function(currentChats){  //new state after modification
         const currentChat = currentChats[targetChat];
 
         if(!currentChat){
           return currentChats;
         }
+        //React states are not modified directly
+        //cause react checks references now if you add a new object no change
+        //so create a new object copy all chats then add this new chat
 
-        return {
-          ...currentChats,
+        return {   //send new Object
+          ...currentChats, //other chats
           [targetChat]: {
-            ...currentChat,
-            preview: sentMessage.text,
-            messages: [...currentChat.messages, sentMessage]
+            ...currentChat, //old chat of this friend
+            preview: sentMessage.text,  //preview is changed
+            messages: [...currentChat.messages, sentMessage] //add newmessage
           }
         };
       });
-    } finally {
+    } finally { //unlock the button independent of success/failure
       setIsSending(false);
     }
   }
 
   function handleSettingsClick(event){
-    event.preventDefault();
-    onSettingsClick();
+    event.preventDefault();  //stop default navigation
+    onSettingsClick();  //parent handles the click 
   }
 
   return (
