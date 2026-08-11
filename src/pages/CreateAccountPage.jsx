@@ -5,7 +5,8 @@ import PrimaryButton from "../components/auth/PrimaryButton.jsx";
 import AuthLayout from "../layouts/AuthLayout.jsx";
 import createAccountBackground from "../assets/images/auth/create-account-background.png";
 import { useValidatedForm } from "../hooks/useValidatedForm.js";
-import { fakeServerRequest, patterns } from "../utils/validation.js";
+import { patterns } from "../utils/validation.js";
+import { signupUser } from "../services/authApi.js";
 
 // 85% similar to login page
 const initialValues = {
@@ -91,6 +92,7 @@ function getCreateAccountFields(values){
 export default function CreateAccountPage({ onAccountCreated, onLoginClick }){
   const form = useValidatedForm(initialValues, getCreateAccountFields);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [serverError, setServerError] = useState("");
 
   async function handleSubmit(event){
     event.preventDefault();
@@ -100,15 +102,24 @@ export default function CreateAccountPage({ onAccountCreated, onLoginClick }){
     }
 
     setIsSubmitting(true);
+    setServerError("");
     try {
-      const response = await fakeServerRequest("Account created successfully!");
+      const response = await signupUser({
+        username: form.values.username.trim(),
+        email: form.values.email.trim(),
+        password: form.values.password
+      });
+      // Sends signup data to Express.
+      // Later this same route will save the user in MongoDB.
 
       if(response.success){
         onAccountCreated({
-          username: form.values.username.trim(),
-          email: form.values.email.trim()
+          username: response.data.user.username,
+          email: response.data.user.email
         });
       }
+    } catch (error) {
+      setServerError(error.message);
     } finally {
       setIsSubmitting(false);
     }
@@ -130,6 +141,12 @@ export default function CreateAccountPage({ onAccountCreated, onLoginClick }){
         </p>
 
         <form noValidate onSubmit={handleSubmit} className="flex flex-col gap-4">
+          {serverError && (
+            <p className="rounded bg-red-500/20 px-3 py-2 text-sm text-red-100">
+              {serverError}
+            </p>
+          )}
+
           <FormInput
             id="username"
             type="text"

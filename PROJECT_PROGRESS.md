@@ -123,11 +123,50 @@ Done:
 - Added `.vite/` to `.gitignore`.
 - Verified the app with a production build.
 
+## Day 12
+Started backend connection with Express and REST API.
+
+Done:
+- Created a separate `backend` folder for the Express server.
+- Added `backend/package.json` with backend-only scripts and dependencies.
+- Installed `express` and `cors` for the backend.
+- Created `backend/server.js`.
+- Added `GET /api/health` to test if the backend is running.
+- Added temporary in-memory users array.
+- Added `POST /api/auth/signup` for creating an account.
+- Added `POST /api/auth/login` for logging in.
+- Connected React login form to the Express login route.
+- Connected React create-account form to the Express signup route.
+- Added `src/services/authApi.js` to keep backend request code in one simple place.
+- Added frontend error messages for failed backend login/signup requests.
+- Verified backend health, signup, and login routes.
+- Verified the React app with a production build.
+
+## Day 13
+Finished the pre-MongoDB Node, Express, and REST API structure.
+
+Done:
+- Arranged backend into a simple structure without too many small files:
+  - `server.js` for app setup and middleware.
+  - `routes/apiRoutes.js` for REST API routes.
+  - `data/store.js` for temporary in-memory users and messages.
+- Kept temporary users and messages in memory until MongoDB is added.
+- Added backend validation for signup and login.
+- Added safe public user response so passwords are not sent to frontend.
+- Added `GET /api/users` for a future contacts/sidebar list.
+- Added `GET /api/users/:id` to fetch one user.
+- Added `POST /api/messages` to send a temporary message.
+- Added `GET /api/messages/:firstUserId/:secondUserId` to fetch chat messages between two users.
+- Added a simple 404 API response for wrong routes.
+- Verified signup, login, users list, send message, and fetch messages using REST requests.
+
 ## Current State
-The React frontend prototype is mostly ready for backend integration. Data is still stored locally or mocked.
+The React frontend now talks to a basic Express backend for signup and login.
+Users and messages are still stored in temporary in-memory arrays, so they reset when the backend restarts.
+Chat UI and settings data are still stored locally in the browser.
 
 ## Next Work
-- Start backend with only Node.js + Express.js.
-- Create basic Express server and test route: `GET /api/health`.
-- Add simple login and create-account routes with temporary in-memory arrays.
-- Connect React login/signup forms to Express using `fetch`.
+- Review the REST API flow once from frontend to backend.
+- Start MongoDB Atlas and Mongoose.
+- Replace the temporary users array with a real User model.
+- Replace the temporary messages array with a real Message model.

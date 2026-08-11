@@ -4,10 +4,11 @@ import PrimaryButton from "../components/auth/PrimaryButton.jsx";
 import AuthLayout from "../layouts/AuthLayout.jsx";
 import loginBackground from "../assets/images/auth/login-background.png";
 import { useValidatedForm } from "../hooks/useValidatedForm.js";
-import { fakeServerRequest, patterns } from "../utils/validation.js";
+import { patterns } from "../utils/validation.js";
+import { loginUser } from "../services/authApi.js";
 import { useState } from "react";
 
-const initialValues = { // s  tore initial form values
+const initialValues = { // store initial form values
   email: "",
   password: ""
 };
@@ -50,6 +51,7 @@ export default function LoginPage({ onCreateAccountClick, onLoginSuccess }){
   
   const form = useValidatedForm(initialValues, getLoginFields); //returns an object see this in other file 
   const [isSubmitting, setIsSubmitting] = useState(false); //stores login requests running or not
+  const [serverError, setServerError] = useState("");
 
   async function handleSubmit(event){
      // browser refreshes the form and sends data when submitted 
@@ -61,16 +63,23 @@ export default function LoginPage({ onCreateAccountClick, onLoginSuccess }){
     }
 
     setIsSubmitting(true); // disable button means valid so logging starts
+    setServerError("");
     try {
-      const response = await fakeServerRequest("Login successful.");
-      //pretends to send data to server and it returns response
-      //cause we didn't connect backend yet
+      const response = await loginUser({
+        email: form.values.email.trim(),
+        password: form.values.password
+      });
+      // Sends login data to our Express backend.
+      // The backend checks the temporary users array for now.
 
       if(response.success){
         onLoginSuccess({  //sends that login is succss and email to parent
-          email: form.values.email.trim()
+          username: response.data.user.username,
+          email: response.data.user.email
         });
       }
+    } catch (error) {
+      setServerError(error.message);
     } finally { //back to normal make issubmitted false
       setIsSubmitting(false); //enable button
     }
@@ -89,6 +98,12 @@ export default function LoginPage({ onCreateAccountClick, onLoginSuccess }){
         </h1>
 
         <form noValidate onSubmit={handleSubmit} className="flex flex-col gap-4">
+          {serverError && (
+            <p className="rounded bg-red-500/20 px-3 py-2 text-sm text-red-100">
+              {serverError}
+            </p>
+          )}
+
           <FormInput
             id="email"
             type="email"

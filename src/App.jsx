@@ -81,7 +81,7 @@ function AppRoutes(){
 
   function handleLoginSuccess(userDetails){
     const nextUser = {
-      name: settings.displayName,
+      name: userDetails.username || settings.displayName,
       email: userDetails.email
     };
 
