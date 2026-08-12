@@ -1,9 +1,11 @@
 import express from "express";
 import cors from "cors";
+import "dotenv/config";
 import apiRoutes from "./routes/apiRoutes.js";
 
 const app = express();
-const PORT = 5001;
+const PORT = process.env.PORT || 5001;
+const CLIENT_URL = process.env.CLIENT_URL || "http://localhost:5173";
 
 // Middleware runs before our routes.
 // express.json() lets Express read JSON data sent from the React frontend.
@@ -12,7 +14,7 @@ app.use(express.json());
 // CORS allows the frontend dev server to talk to this backend.
 // Vite may be opened as localhost:5173 or 127.0.0.1:5173 on Windows.
 app.use(cors({
-  origin: ["http://localhost:5173", "http://127.0.0.1:5173"]
+  origin: [CLIENT_URL, "http://127.0.0.1:5173"]
 }));
 
 // All REST API routes start with /api.
