@@ -7,7 +7,7 @@ export default function AuthLayout({ backgroundImage, overlayClassName, children
       style={{ backgroundImage: `url(${backgroundImage})` }}
     >
       <section
-        className={[  //so this iverlayClassname is for some extra css for card like create account card is bigger than the login page card
+        className={[ // overlayClassName adds page-specific overlay styling.
           "flex min-h-screen items-center justify-center gap-[clamp(30px,8vw,120px)] p-[clamp(24px,5vw,70px)] max-[600px]:flex-col max-[600px]:justify-start max-[600px]:pt-[35px]",
           overlayClassName
         ].join(" ")}

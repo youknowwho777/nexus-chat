@@ -1,5 +1,5 @@
 export default function PrimaryButton({ children, disabled }){
-  return ( // just the login/create button reusable
+  return ( // Reusable submit button for auth forms.
     <button
       type="submit"
       disabled={disabled}

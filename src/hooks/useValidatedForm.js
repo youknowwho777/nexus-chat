@@ -6,26 +6,23 @@ export function useValidatedForm(initialValues, getFields){
   const [errors, setErrors] = useState({});
   const [submitted, setSubmitted] = useState(false);
 
-  function validate(nextValues = values){ //validate() ===> becomes validate(values)
+  function validate(nextValues = values){ // Use current values unless new ones are passed in.
     const nextErrors = validateFields(getFields(nextValues)); 
-    //validates from the helper function stores all errors 
+    // Store all validation errors from the helper.
     setErrors(nextErrors);  
-    return Object.keys(nextErrors).length === 0;  // if no errors then "true" 
+    return Object.keys(nextErrors).length === 0; // true means the form is valid.
   }
 
   function updateField(name, value){ 
-    //this is for keep on updating values when input changes in form
-    // this function is called in login /create account pages when input changes
+    // Update form state whenever an input changes.
     const nextValues = {
-      ...values, //only the changed object is modified rest is copied directly
+      ...values, // Keep other fields the same.
       [name]: value
     };
 
     setValues(nextValues);
 
-    if(submitted){ // this is for user experience 
-      //after first error till next submit() the page shows error 
-      // so with this when input is valid error msg stops on screen even without submit()
+    if(submitted){ // After first submit, validate while the user fixes fields.
       const nextErrors = validateFields(getFields(nextValues));
       setErrors(nextErrors);
     }

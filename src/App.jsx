@@ -12,13 +12,13 @@ import CreateAccountPage from "./pages/CreateAccountPage.jsx";
 import LoginPage from "./pages/LoginPage.jsx";
 import SettingsPage from "./pages/SettingsPage.jsx";
 
-const storageKeys = {
+const storageKeys = { // LocalStorage key names.
   user: "nexus:user",
   chats: "nexus:chats",
   settings: "nexus:settings"
 };
 
-const defaultSettings = { // local Storage default values
+const defaultSettings = { // Default settings before the user changes them.
   displayName: "Siddu",
   email: "siddu@nexus.dev",
   theme: "blue",
@@ -26,7 +26,7 @@ const defaultSettings = { // local Storage default values
   aiAssistant: true
 };
 
-function readStorage(key, fallback){ //helper function to read from local storage
+function readStorage(key, fallback){ // Safely read saved LocalStorage data.
   try {
     const savedValue = window.localStorage.getItem(key);
     return savedValue ? JSON.parse(savedValue) : fallback;
@@ -35,7 +35,7 @@ function readStorage(key, fallback){ //helper function to read from local storag
   }
 }
 
-function writeStorage(key, value){  //to write everything
+function writeStorage(key, value){ // Save data to LocalStorage.
   window.localStorage.setItem(key, JSON.stringify(value));
 }
 

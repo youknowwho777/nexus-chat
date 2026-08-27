@@ -124,8 +124,8 @@ router.post("/auth/login", function(request, response){
 });
 
 router.get("/users", function(request, response){
-  // This route is useful for a future contacts/sidebar list.
-  // It returns users without passwords.
+  // Used later for the contacts/sidebar list.
+  // Passwords are not included.
   const publicUsers = users.map(function(user){
     return createPublicUser(user);
   });

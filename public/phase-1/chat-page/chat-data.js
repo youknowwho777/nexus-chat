@@ -1,6 +1,6 @@
 export const chatStore = {
     activeChat: "",
-    // Each chat keeps its status, sidebar preview, and full message list together.
+    // Each chat stores status, preview, and messages together.
     chats: {
         Max: {
             status: "Online",
@@ -53,14 +53,14 @@ export const chatStore = {
         return this.chats[name].messages;
     },
     addMessage: function(name, message){
-        // const object can still update nested arrays like this messages list.
+        // const stops reassignment, but nested arrays can still change.
         this.chats[name].messages.push(message);
     },
     searchChats: function(searchValue){
         const searchText = searchValue.trim().toLowerCase();
         const chats = this.chats;
 
-        // Search checks both the friend's name and the small preview text.
+        // Search by friend name or preview text.
         return Object.keys(chats).filter(function(name){
             const chat = chats[name];
             return name.toLowerCase().includes(searchText)
@@ -72,7 +72,7 @@ export const chatStore = {
 export function sendMessageAsync(text){
     return new Promise(function(resolve){
         setTimeout(function(){
-            // Small fake delay so later this can be replaced with a real server call.
+            // Fake delay until this becomes a real server call.
             resolve({
                 text: text,
                 type: "sent"

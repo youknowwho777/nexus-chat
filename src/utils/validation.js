@@ -1,43 +1,42 @@
 export const patterns = {
-  email: /^[^\s@]+@[^\s@]+\.[^\s@]+$/, //patterns.email.test() 
-  username: /^[A-Za-z0-9_]+$/  //user name pattern
+  email: /^[^\s@]+@[^\s@]+\.[^\s@]+$/, // Email format check.
+  username: /^[A-Za-z0-9_]+$/ // Username can use letters, numbers, and underscores.
 };
 
-//these are our validation rules which we gave for the authentication
-//these are used by custom hook to validate 
+// Shared validation helper for auth forms.
 
 export function validateFields(fields){
-   //fields is from that validation (values+rules array of objects)
+   // fields contains each input value and its rules.
   
    return fields.reduce(function(errors, field){ 
-    // reduce() goes through one by one object
+    // Check each field and keep the first failed rule.
     const failedRule = field.rules.find(function(rule){
       return !rule.test(field.value);
     });
 
     if(failedRule){
-      return { //errors is object if you know this syntax 
-        //evrytime a validation fails add the error to the other errors in the object
+      return {
+        // Add this field error without losing earlier errors.
         ...errors,
         [field.name]: failedRule.message 
       };
     }
 
-    return errors; // finally return the all errors {name:messgae} format 
-  }, {});  //intially {} empty object we build all the errors in this 
+    return errors; // Return errors as { fieldName: message }.
+  }, {}); // Start with no errors.
 }
-//syntax issues : learn it 
-/*  fields.reduce(function(temp,index){
-    },{});      
-     
-    means the temp is initially empty object and index is each value of fiel  ds 
+
+// reduce() starts with {} and builds the final errors object.
+/*  fields.reduce(function(errors, field){
+    return errors;
+  }, {});
 */
 
 export function fakeServerRequest(successMessage){
-  return new Promise(function(resolve){ //(resolve,reject)
+  return new Promise(function(resolve){
     setTimeout(function(){
-      resolve({ //if success then show this message
-        success: true, //we do if (response.success) in login page 
+      resolve({
+        success: true, // Login page checks this with response.success.
         message: successMessage
       });
     }, 500);

@@ -9,7 +9,7 @@ const confirmPassword = document.getElementById("confirm-password");
 
 let createAccountSubmitted = false;
 
-// All create account inputs and their validation rules are grouped here.
+// Keep signup inputs and validation rules together.
 const createAccountFields = {
     username: {
         input: username,
@@ -98,7 +98,7 @@ function validateCreateAccount(){
 }
 
 async function handleCreateAccount(event){
-    event.preventDefault(); // stops browser page reload on form submit
+    event.preventDefault(); // Stop browser reload on submit.
     createAccountSubmitted = true;
 
     if(!validateCreateAccount()){
@@ -108,12 +108,12 @@ async function handleCreateAccount(event){
     createButton.disabled = true;
     createButton.textContent = "Creating...";
 
-    // Fake server delay for now; replace with backend signup later.
+    // Fake server delay until backend signup is connected.
     const response = await fakeServerRequest("Account created successfully!");
 
     if(response.success){
         alert(response.message);
-        // Send user back to login after account creation.
+        // Return to login after account creation.
         window.location.href = "login-page.html";
     }
 }
@@ -123,7 +123,7 @@ createAccountForm.addEventListener("submit", handleCreateAccount);
 Object.values(createAccountFields).forEach(function(field){
     field.input.addEventListener("input", function(){
         if(createAccountSubmitted){
-            // After first submit, keep validating while user fixes typing.
+            // After first submit, validate while the user fixes input.
             validateCreateAccount();
         }
     });

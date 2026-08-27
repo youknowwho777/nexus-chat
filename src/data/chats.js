@@ -1,6 +1,6 @@
-//Initial chats database type : 
-//stores as obejcts easier to acesss than arrays
-//each message : name, preview, text, type 
+// Temporary chat data before backend messages are connected.
+// Object keys make each chat easy to find by name.
+// Each chat stores status, preview, and messages.
 export const initialChats = {
   Max: {
     status: "Online",
@@ -44,13 +44,13 @@ export const initialChats = {
   }
 };
 
- //for sending messages makes clear when we have a backend
+// Fake message sender until the backend handles chat messages.
 export function sendMessageAsync(text){ 
-  return new Promise(function(resolve){ //takes text and returns a promise
-    setTimeout(function(){  //just a fake delay to make it realistic
+  return new Promise(function(resolve){ // Takes text and returns a Promise.
+    setTimeout(function(){ // Small delay to feel like a real request.
       resolve({
         id: window.crypto?.randomUUID?.() || String(Date.now()),
-        //the above syntax is Optimal Chaining lets study later
+        // Optional chaining safely checks if randomUUID exists.
         text: text,
         type: "sent",
         createdAt: new Date().toISOString()
@@ -60,7 +60,6 @@ export function sendMessageAsync(text){
 }
 
 export function createInitialChats(){ 
-   //this send copy of initial chats to app.js not to chatpage  
-  //that way editing it  will not effect 
+  // Send App a fresh copy so edits do not change initialChats.
   return structuredClone(initialChats);
 }

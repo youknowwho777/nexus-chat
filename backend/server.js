@@ -7,21 +7,21 @@ const app = express();
 const PORT = process.env.PORT || 5001;
 const CLIENT_URL = process.env.CLIENT_URL || "http://localhost:5173";
 
-// Middleware runs before our routes.
-// express.json() lets Express read JSON data sent from the React frontend.
+// Middleware runs before routes.
+// This lets Express read JSON from React.
 app.use(express.json());
 
-// CORS allows the frontend dev server to talk to this backend.
-// Vite may be opened as localhost:5173 or 127.0.0.1:5173 on Windows.
+// Allow the Vite frontend to call this backend.
+// Windows may open Vite with localhost or 127.0.0.1.
 app.use(cors({
   origin: [CLIENT_URL, "http://127.0.0.1:5173"]
 }));
 
-// All REST API routes start with /api.
-// Example: /api/auth/login, /api/users, /api/messages
+// All REST routes start with /api.
+// Examples: /api/auth/login, /api/users, /api/messages
 app.use("/api", apiRoutes);
 
-// If no route matched above, the API path is wrong.
+// Send a clear response for unknown API routes.
 app.use(function(request, response){
   response.status(404).json({
     success: false,

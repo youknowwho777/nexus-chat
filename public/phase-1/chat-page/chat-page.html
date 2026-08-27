@@ -25,15 +25,15 @@ body{
     background-repeat:no-repeat;
     color:white;
     overflow:hidden; 
-    position:relative;  /* if not relative overlay positioning breaks*/
+    position:relative;  /* Needed for the background overlay. */
 }
-/* Dark overlay on Background  */
+/* Dark overlay on the background. */
 body::before{
     content:"";
     position:absolute;
-    inset:0;  /*top,bottom,left,right : all 0 (covers entire page)*/
+    inset:0;  /* Covers the whole page. */
     background:rgba(3,8,20, 0.55);
-    z-index:-1; /*pushes overlay behind content and over image*/
+    z-index:-1; /* Keeps overlay behind content. */
 }
 
 .chat-page{
@@ -49,8 +49,8 @@ body::before{
     justify-content:space-between;
     align-items:center;
     gap:18px;
-    padding:0 clamp(14px, 3vw, 25px); /*side spaces top=bottom=0*/
-    background:rgba(5,15,35,0.55); /*glass like background*/
+    padding:0 clamp(14px, 3vw, 25px); /* Responsive side spacing. */
+    background:rgba(5,15,35,0.55); /* Glass-style background. */
     backdrop-filter:blur(15px);
     border-bottom:1px solid rgba(255,255,255,0.08);
 }
@@ -59,7 +59,7 @@ body::before{
     display:flex;
     align-items:center;
     gap:12px;
-    min-width:0; /*text overflow control during size shrinking*/
+    min-width:0; /* Helps text shrink without breaking layout. */
 }
 
 .logo-section img{
@@ -138,15 +138,15 @@ body::before{
     color:#bfc6d8;
 }
 
-/* Chat List */
+/* Chat list. */
 
 .chat-list{
-    flex:1; /*below search remaining sidebar taken by the list */
+    flex:1; /* List takes the remaining sidebar height. */
     overflow-y:auto;
     min-height:0;
 }
 
-/*Custom Scrollbar */
+/* Custom scrollbar. */
 .chat-list::-webkit-scrollbar{ 
     width:6px;
 }
@@ -201,7 +201,7 @@ body::before{
     margin-bottom:4px;
     font-size:1rem;
     
-    /*make long text into continueing test like hi....*/
+    /* Show long text with dots. */
     overflow:hidden;
     text-overflow:ellipsis;
     white-space:nowrap;
@@ -261,7 +261,7 @@ body::before{
 }
 
 .back-to-list{
-    display:none;  /*back to list is only for Mobile version*/
+    display:none;  /* Back button appears only on mobile. */
     width:40px;
     height:40px;
     border:none;
@@ -305,12 +305,12 @@ body::before{
 }
 
 .message.received{
-    align-self:flex-start; /*moves to left side */
+    align-self:flex-start; /* Received messages go left. */
     background:rgba(255,255,255,0.10);
 }
 
 .message.sent{
-    align-self:flex-end;/*moves to right side */
+    align-self:flex-end; /* Sent messages go right. */
     background:#2563eb;
 }
 
@@ -355,7 +355,7 @@ body::before{
 @media(max-width:900px){
 
     .sidebar{
-        width:45%;  /*increase chat area as Total size decreases*/
+        width:45%;  /* Give more space to the chat area on smaller screens. */
         min-width:260px;
     }
 
@@ -380,7 +380,7 @@ body::before{
     }
 
     .chat-content{
-        display:block; /*flex(side by  side) to block(up and down)  */
+        display:block; /* Stack sidebar and chat area on mobile. */
         overflow:visible;
     }
 
@@ -392,11 +392,11 @@ body::before{
     }
 
     .chat-area{
-        display:none;/*hide chat area laptop style*/
+        display:none; /* Hide desktop chat area on mobile. */
     }
 
     .chat-content.chat-open .sidebar{
-        display:none;  /*hide sidebar when caht is opened*/
+        display:none;  /* Hide sidebar when a chat is open. */
     }
 
     .chat-content.chat-open .chat-area{
@@ -494,7 +494,7 @@ body::before{
             </div>
             <div class="conversation" id="conversation">
                 <div class="chat-header">
-                    <!--For Mobile Screens Design-->
+                    <!-- Mobile back button. -->
                     <button class="back-to-list" id="back-to-list" type="button">  
                         <i class="fa-solid fa-arrow-left"></i>
                     </button>
@@ -504,7 +504,7 @@ body::before{
                         <p id="chat-status">Online</p>
                     </div>
                 </div>
-                <div class="message-list" id="message-list"></div>  <!-- JS dynamically uses this to store chat sent and received -->
+                <div class="message-list" id="message-list"></div>  <!-- JS adds sent and received messages here. -->
                 <form class="message-form" id="message-form">
                     <input
                         type="text" 

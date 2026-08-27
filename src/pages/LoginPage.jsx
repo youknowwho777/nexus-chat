@@ -8,24 +8,24 @@ import { patterns } from "../utils/validation.js";
 import { loginUser } from "../services/authApi.js";
 import { useState } from "react";
 
-const initialValues = { // store initial form values
+const initialValues = { // Starting form values.
   email: "",
   password: ""
 };
 
-function getLoginFields(values){ //values is an object of email and password from the input fields
-  return [ //returns an array of objects (EmailObject , PassObject)
+function getLoginFields(values){ // values contains the current form inputs.
+  return [ // Each object describes one field and its rules.
     {
       name: "email",
       value: values.email.trim(),
-      rules: [ // array stores validation rules 2 objects with 2 messages 
+      rules: [ // Run these rules in order.
         {
           test: Boolean,
           message: "Email is required."
         },
         {
           test: function(value){
-            return patterns.email.test(value); //regex pattern buil-in function 
+            return patterns.email.test(value); // Check email with regex.
           },
           message: "Enter a valid email address." 
         }
@@ -43,49 +43,48 @@ function getLoginFields(values){ //values is an object of email and password fro
     }
   ];
 }
-//LoginFields() does not validate the form.
+// getLoginFields() does not validate by itself.
 // It only describes the fields and their validation rules.
 
 export default function LoginPage({ onCreateAccountClick, onLoginSuccess }){
   
   
-  const form = useValidatedForm(initialValues, getLoginFields); //returns an object see this in other file 
-  const [isSubmitting, setIsSubmitting] = useState(false); //stores login requests running or not
+  const form = useValidatedForm(initialValues, getLoginFields); // Form state and validation helpers.
+  const [isSubmitting, setIsSubmitting] = useState(false); // Tracks if login is running.
   const [serverError, setServerError] = useState("");
 
   async function handleSubmit(event){
-     // browser refreshes the form and sends data when submitted 
-     //so stop that action
+    // Stop the browser from refreshing on form submit.
     event.preventDefault();
 
     if(!form.submit()){
-      return;  // validation failed so dont run below code  
+      return; // Stop if validation failed.
     }
 
-    setIsSubmitting(true); // disable button means valid so logging starts
+    setIsSubmitting(true); // Disable button while login runs.
     setServerError("");
     try {
       const response = await loginUser({
         email: form.values.email.trim(),
         password: form.values.password
       });
-      // Sends login data to our Express backend.
-      // The backend checks the temporary users array for now.
+      // Send login data to Express.
+      // For now, the backend checks temporary users.
 
       if(response.success){
-        onLoginSuccess({  //sends that login is succss and email to parent
+        onLoginSuccess({ // Tell App that login worked.
           username: response.data.user.username,
           email: response.data.user.email
         });
       }
     } catch (error) {
       setServerError(error.message);
-    } finally { //back to normal make issubmitted false
-      setIsSubmitting(false); //enable button
+    } finally {
+      setIsSubmitting(false); // Enable button again.
     }
   }
 
-  function handleCreateAccountClick(event){ //handle clickicking createaccount 
+  function handleCreateAccountClick(event){ // Navigate without a full page reload.
     event.preventDefault();
     onCreateAccountClick();
   }
@@ -111,8 +110,8 @@ export default function LoginPage({ onCreateAccountClick, onLoginSuccess }){
             error={form.errors.email}
             placeholder="Email"
             autoComplete="email"
-            //for every change we update form values too 
-            onChange={function(event){ //data bindiing 
+            // Keep form state in sync with typing.
+            onChange={function(event){
               form.updateField("email", event.target.value);
             }}
           />

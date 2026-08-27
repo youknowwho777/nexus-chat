@@ -11,8 +11,8 @@ async function sendAuthRequest(path, formData){
 
   const result = await response.json();
 
-  // fetch does not throw an error for 400/401/409 responses.
-  // So we manually throw the backend message when the request failed.
+  // fetch does not throw for 400/401/409 responses.
+  // Throw the backend message ourselves when a request fails.
   if(!response.ok){
     throw new Error(result.message || "Something went wrong.");
   }

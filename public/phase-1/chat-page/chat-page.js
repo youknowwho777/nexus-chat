@@ -24,7 +24,7 @@ function scrollToLatestMessage(){
 }
 
 function renderMessages(name){
-    messageList.innerHTML = ""; // clean old messages before opening another chat
+    messageList.innerHTML = ""; // Clear old messages before opening another chat.
 
     chatStore.getMessages(name).forEach(function(message){
         messageList.appendChild(createMessageBox(message));
@@ -37,18 +37,18 @@ function openChat(card){
     const selectedChat = card.dataset.name;
     chatStore.setActiveChat(selectedChat);
 
-    // Update top chat header with selected friend's details.
+    // Show selected friend's details in the header.
     const activeChatData = chatStore.getActiveChat();
     chatName.textContent = selectedChat;
     chatStatus.textContent = activeChatData.status;
 
-    // Highlight only the chat card that is currently open.
+    // Highlight only the open chat card.
     chatCards.forEach(function(chatCard){
         chatCard.classList.toggle("active", chatCard === card);
     });
 
     welcomeBox.style.display = "none";
-    // These classes switch the page from welcome/list view into chat view.
+    // Switch from welcome/list view into chat view.
     conversation.classList.add("active");
     chatContent.classList.add("chat-open");
     renderMessages(selectedChat);
@@ -59,7 +59,7 @@ function filterChats(){
 
     chatCards.forEach(function(card){
         const isMatch = matchingNames.includes(card.dataset.name);
-        // Hide cards that do not match the search text.
+        // Hide cards that do not match the search.
         card.classList.toggle("hidden", !isMatch);
     });
 }
@@ -72,17 +72,17 @@ async function handleMessageSubmit(event){
     const targetChat = chatStore.activeChat;
 
     if(!messageText || !targetChat){
-        // Prevent empty messages and sending before any chat is selected.
+        // Stop empty messages or sending without a selected chat.
         return;
     }
 
-    messageInput.value = ""; // clear input after send starts
+    messageInput.value = ""; // Clear input after send starts.
     const sentMessage = await sendMessageAsync(messageText);
     chatStore.addMessage(targetChat, sentMessage);
 
     if(chatStore.activeChat === targetChat){
         messageList.appendChild(createMessageBox(sentMessage));
-        scrollToLatestMessage(); // auto scroll to the new message
+        scrollToLatestMessage(); // Scroll to the new message.
     }
 }
 

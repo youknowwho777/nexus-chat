@@ -1,12 +1,12 @@
-// This file is our temporary "database" before MongoDB.
-// Data stored here resets whenever the backend server restarts.
+// Temporary database before MongoDB.
+// This data resets when the backend restarts.
 
 export const users = [];
 export const messages = [];
 
 export function createPublicUser(user){
-  // Public user means safe user data that can be sent to the frontend.
-  // Password is intentionally not included.
+  // Send only safe user details to the frontend.
+  // Never include the password.
   return {
     id: user.id,
     username: user.username,

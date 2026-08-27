@@ -28,34 +28,34 @@ body{
     display:flex;
     justify-content:center;
     align-items:center;
-    gap:clamp(30px, 8vw, 120px);  /* clamp is for responsive design clamp(min, preferred,max)*/
+    gap:clamp(30px, 8vw, 120px);  /* clamp(min, preferred, max) keeps spacing responsive. */
     padding:clamp(24px, 5vw, 70px);
 }
 
 .brand-section{
-    flex:0 0 auto;  /* 0: grow, 0: shrink , auto:basis  means NO shrink or stretch*/
+    flex:0 0 auto;  /* No grow, no shrink, auto size. */
 }
 
 .brand-logo{
     width:clamp(120px, 18vw, 250px);
-    aspect-ratio:1; /*width : height = 1:1 */
+    aspect-ratio:1; /* Keeps width and height equal. */
     border-radius:55%;
-    object-fit:cover;  /* cropping */
+    object-fit:cover;  /* Crop image nicely inside the box. */
     box-shadow:0 20px 45px rgba(20, 20, 20, 0.45);
 }
 
 .login-card{
-    width:min(100%, 520px);   /* another responsive function*/
+    width:min(100%, 520px);   /* Full width, but never wider than 520px. */
     padding:clamp(30px, 5vw, 50px);
     background:rgba(20,20,20,0.55);
     border-radius:20px;
-    backdrop-filter:blur(15px); /* Glassmorphism effect*/
+    backdrop-filter:blur(15px); /* Glass effect. */
     box-shadow:0 15px 40px rgba(0,0,0,0.35);
 }
 
 .login-heading{
     text-align:center;
-    font-size:clamp(1.8rem, 4vw, 2.3rem);  /*rem: browser default(16px) automatically increases size w.r.t browser font size*/
+    font-size:clamp(1.8rem, 4vw, 2.3rem);  /* Responsive heading size. */
     color:white;
     margin-bottom:clamp(24px, 4vw, 35px);
 }
@@ -68,7 +68,7 @@ body{
 
 .form-group{
     display:flex;
-    flex-direction:column; /*default is horizantal so change to vertical*/
+    flex-direction:column; /* Stack label/input vertically. */
     gap:6px;
 }
 
@@ -155,7 +155,7 @@ body{
     }
 
     .create-account-text{
-        line-height:1.5;  /*improves readability*/
+        line-height:1.5;  /* Improves readability. */
     }
 }
 </style>

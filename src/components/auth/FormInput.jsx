@@ -1,4 +1,4 @@
-export default function FormInput({  //props destructuring 
+export default function FormInput({ // Reusable input props.
   id, 
   type,
   value,
@@ -15,12 +15,12 @@ export default function FormInput({  //props destructuring
         value={value}
         placeholder={placeholder}
         autoComplete={autoComplete}
-        //HTML Accessibilites
-        aria-label={placeholder}  //give input a readable name
-        aria-invalid={Boolean(error)} //tells if input is true/false
-        aria-describedby={`${id}-error`} //connects erro with input message
+        // Accessibility helpers for screen readers.
+        aria-label={placeholder} // Gives the input a readable name.
+        aria-invalid={Boolean(error)} // Marks the input invalid when there is an error.
+        aria-describedby={`${id}-error`} // Connects the error text to this input.
         onChange={onChange}
-        className={[ //if error occurs make css red shadow else blue
+        className={[ // Red shadow for errors, blue shadow while focused.
           "w-full rounded-xl border-0 bg-[#2c2c2c] px-[18px] py-[clamp(14px,3vw,18px)] text-base text-white placeholder:text-white focus:outline-none",
           error ? "shadow-[0_0_0_2px_rgba(248,113,113,0.9)]"
             : "focus:shadow-[0_0_4px_3px_rgba(78,175,231,0.75)]"

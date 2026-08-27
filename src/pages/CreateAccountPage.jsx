@@ -8,7 +8,7 @@ import { useValidatedForm } from "../hooks/useValidatedForm.js";
 import { patterns } from "../utils/validation.js";
 import { signupUser } from "../services/authApi.js";
 
-// 85% similar to login page
+// Similar to login, but with more signup fields.
 const initialValues = {
   username: "",
   email: "",
@@ -97,7 +97,7 @@ export default function CreateAccountPage({ onAccountCreated, onLoginClick }){
   async function handleSubmit(event){
     event.preventDefault();
 
-    if(!form.submit()){ //if from is not valid then dont run the below success code 
+    if(!form.submit()){ // Stop if the form is not valid.
       return;
     }
 
@@ -109,8 +109,8 @@ export default function CreateAccountPage({ onAccountCreated, onLoginClick }){
         email: form.values.email.trim(),
         password: form.values.password
       });
-      // Sends signup data to Express.
-      // Later this same route will save the user in MongoDB.
+      // Send signup data to Express.
+      // Later, this route will save users in MongoDB.
 
       if(response.success){
         onAccountCreated({

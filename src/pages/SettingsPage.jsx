@@ -33,13 +33,15 @@ const backgroundOptions = [
 ];
 
 export default function SettingsPage({
-  currentUser,
-  settings,
-  onSettingsChange,
+  currentUser, // Logged-in user info.
+  settings, // Current saved settings.
+  onSettingsChange, // App saves the updated settings.
   onBackClick,
   onLogoutClick
 }){
+  // Draft is a temporary copy the user can edit.
   const [draftSettings, setDraftSettings] = useState(settings);
+  // Used to enable Save only when something changed.
   const hasChanges = JSON.stringify(draftSettings) !== JSON.stringify(settings);
 
   function handleBackClick(event){
@@ -58,7 +60,7 @@ export default function SettingsPage({
 
   function handleSubmit(event){
     event.preventDefault();
-    onSettingsChange({
+    onSettingsChange({ // Save theme, background, name, and email.
       ...draftSettings,
       displayName: draftSettings.displayName.trim() || settings.displayName,
       email: draftSettings.email.trim() || settings.email
