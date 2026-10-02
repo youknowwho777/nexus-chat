@@ -1,6 +1,7 @@
 import express from "express";
 import cors from "cors";
 import "dotenv/config";
+import { connectDB } from "./config/db.js";
 import apiRoutes from "./routes/apiRoutes.js";
 
 const app = express();
@@ -22,7 +23,7 @@ app.use(cors({
 app.use("/api", apiRoutes);
 
 // Send a clear response for unknown API routes.
-app.use(function(request, response){
+app.use(function (request, response) {
   response.status(404).json({
     success: false,
     message: "API route not found.",
@@ -30,6 +31,11 @@ app.use(function(request, response){
   });
 });
 
-app.listen(PORT, function(){
-  console.log(`Nexus Chat backend is running on http://localhost:${PORT}`);
-});
+async function startServer() {
+  await connectDB();
+  app.listen(PORT, function () {
+    console.log(`Nexus Chat backend is running on http://localhost:${PORT}`);
+  });
+}
+
+startServer();
