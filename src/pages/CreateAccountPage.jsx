@@ -114,8 +114,10 @@ export default function CreateAccountPage({ onAccountCreated, onLoginClick }){
 
       if(response.success){
         onAccountCreated({
+          id: response.data.user.id,
           username: response.data.user.username,
-          email: response.data.user.email
+          email: response.data.user.email,
+          token: response.data.token
         });
       }
     } catch (error) {

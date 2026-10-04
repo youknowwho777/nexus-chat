@@ -72,9 +72,14 @@ export default function LoginPage({ onCreateAccountClick, onLoginSuccess }){
       // For now, the backend checks temporary users.
 
       if(response.success){
-        onLoginSuccess({ // Tell App that login worked.
+        onLoginSuccess({
+          id: response.data.user.id,
           username: response.data.user.username,
-          email: response.data.user.email
+          email: response.data.user.email,
+          theme: response.data.user.theme,
+          background: response.data.user.background,
+          aiAssistant: response.data.user.aiAssistant,
+          token: response.data.token
         });
       }
     } catch (error) {

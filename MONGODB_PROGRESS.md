@@ -10,7 +10,7 @@ This plan covers MongoDB, user persistence, message persistence, profile/setting
 
 This plan stops before Socket.IO.
 
-## Current State (Active MongoDB & User Persistence)
+## Current State (Phases 1, 2, and 3 Completed)
 
 Done already:
 
@@ -19,17 +19,17 @@ Done already:
 - MongoDB Atlas cluster is connected (`NexusChat` database via Mongoose).
 - `User` model is created targeting the `users` collection with validation.
 - User signup and login use MongoDB with bcrypt password hashing.
-- Temporary `users` array is completely removed.
-- Backend routes for signup, login, and user queries read/write to MongoDB.
-- Messages currently use temporary backend arrays (`backend/data/store.js`).
-- Chat UI still uses local frontend mock chat data.
-- Settings are still saved in browser `localStorage`.
+- JWT authentication and `authMiddleware` protect private routes.
+- `Message` model is created targeting the `messages` collection with compound indexes.
+- Message routes save and fetch persistent conversations from MongoDB.
+- Temporary `backend/data/store.js` is completely removed.
+- Chat UI connects to real backend users and persistent messages.
 
 Current active storage:
 
 ```txt
 users: MongoDB Atlas ('NexusChat.users')
-messages: Temporary backend array ('messages = []')
+messages: MongoDB Atlas ('NexusChat.messages')
 ```
 
 ## Phase 1: MongoDB Foundation
@@ -38,19 +38,19 @@ Goal: create the real database connection and prepare the backend for MongoDB mo
 
 Tasks:
 
-- [x] Create a MongoDB Atlas account.
-- [x] Create a free MongoDB cluster.
-- [x] Create a database user.
-- [x] Add the local/current IP address to Atlas network access.
-- [x] Copy the MongoDB connection string.
-- [x] Create a backend `.env` file.
-- [x] Store the connection string in `.env`.
-- [x] Add `PORT`, `CLIENT_URL`, and `MONGODB_URI` to `.env`.
-- [x] Install Mongoose in the backend.
-- [x] Create a MongoDB connection file.
-- [x] Connect Express server to MongoDB before starting routes.
-- [x] Test that the backend connects successfully.
-- [x] Make sure `.env` is ignored by git.
+- Create a MongoDB Atlas account.
+- Create a free MongoDB cluster.
+- Create a database user.
+- Add the local/current IP address to Atlas network access.
+- Copy the MongoDB connection string.
+- Create a backend `.env` file.
+- Store the connection string in `.env`.
+- Add `PORT`, `CLIENT_URL`, and `MONGODB_URI` to `.env`.
+- Install Mongoose in the backend.
+- Create a MongoDB connection file.
+- Connect Express server to MongoDB before starting routes.
+- Test that the backend connects successfully.
+- Make sure `.env` is ignored by git.
 
 Recommended backend dependency:
 
@@ -101,13 +101,13 @@ Tasks:
 - [x] Remove direct usage of the temporary `users` array for auth.
 - [x] Keep public user responses safe.
 - [x] Make sure password/passwordHash is never returned in API responses.
+- [x] Install JWT package (`jsonwebtoken`).
 - [x] Add `JWT_SECRET` to `.env`.
-- [ ] Install JWT package (`jsonwebtoken`).
-- [ ] Generate a JWT after successful login.
-- [ ] Decide where to store the token.
-- [ ] Create auth middleware.
-- [ ] Add logout behavior.
-- [ ] Update frontend auth flow to remember the logged-in user correctly.
+- [x] Generate a JWT after successful login.
+- [x] Decide where to store the token (`localStorage` under `nexus:token`).
+- [x] Create auth middleware (`backend/middleware/authMiddleware.js`).
+- [x] Add logout behavior.
+- [x] Update frontend auth flow to remember the logged-in user correctly.
 
 Recommended backend dependencies:
 
@@ -171,7 +171,7 @@ Expected result:
 - Private routes reject requests without a valid token.
 - Frontend can keep the user logged in after refresh.
 
-Status: In Progress (User model, MongoDB Atlas connection, password hashing with bcrypt, safe public JSON output, duplicate email prevention, and signup/login/user endpoints completed)
+Status: Completed
 
 ## Phase 3: Messages And React Chat Connection
 
@@ -179,21 +179,21 @@ Goal: replace temporary messages and frontend-only chat data with MongoDB-backed
 
 Tasks:
 
-- Create a Message model using Mongoose.
-- Save every sent message in MongoDB.
-- Fetch chat history between two users from MongoDB.
-- Sort messages by creation time.
-- Validate sender, receiver, and content.
-- Use authenticated sender from JWT instead of trusting frontend `senderId`.
-- Remove direct usage of the temporary `messages` array.
-- Create frontend API service for users.
-- Create frontend API service for messages.
-- Fetch users from backend for the sidebar.
-- Fetch messages when a chat is selected.
-- Send messages through backend API.
-- Replace `sendMessageAsync()` usage.
-- Reduce or remove `src/data/chats.js` mock dependency.
-- Keep useful loading and error states.
+- [x] Create a Message model using Mongoose.
+- [x] Save every sent message in MongoDB.
+- [x] Fetch chat history between two users from MongoDB.
+- [x] Sort messages by creation time.
+- [x] Validate sender, receiver, and content.
+- [x] Use authenticated sender from JWT instead of trusting frontend `senderId`.
+- [x] Remove direct usage of the temporary `messages` array.
+- [x] Create frontend API service for users (`userApi.js`).
+- [x] Create frontend API service for messages (`messageApi.js`).
+- [x] Fetch users from backend for the sidebar.
+- [x] Fetch messages when a chat is selected.
+- [x] Send messages through backend API.
+- [x] Replace `sendMessageAsync()` usage.
+- [x] Reduce or remove `src/data/chats.js` mock dependency.
+- [x] Keep useful loading and error states.
 
 Recommended new backend file:
 
@@ -243,7 +243,7 @@ Expected result:
 - Chat messages come from MongoDB.
 - Sent messages are saved through the backend.
 
-Status: Not started
+Status: Completed
 
 ## Phase 4: Profile/Settings Persistence And REST Cleanup
 
@@ -327,10 +327,12 @@ Socket.IO should begin only after:
 
 ## Next Immediate Step
 
-Complete the remaining items in Phase 2:
+Phase 1, Phase 2, and Phase 3 are now fully implemented and verified!
+
+The next major step is:
 
 ```txt
-Install jsonwebtoken + implement JWT generation on login + protect routes with auth middleware
+Phase 5: Socket.IO Integration for Live Real-Time WebSockets
 ```
 
-After completing JWT authentication, move directly to **Phase 3** (create Mongoose `Message` model and connect React chat messages to MongoDB).
+This will bring instantaneous bi-directional communication, real-time message delivery without polling, typing indicators, and live user online/offline status!

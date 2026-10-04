@@ -1,7 +1,9 @@
 import express from "express";
 import mongoose from "mongoose";
+import jwt from "jsonwebtoken";
 import User, { createPublicUser } from "../models/User.js";
-import { messages } from "../data/store.js";
+import Message from "../models/Message.js";
+import { protectRoute } from "../middleware/authMiddleware.js";
 
 const router = express.Router();
 
@@ -21,6 +23,12 @@ function sendError(response, message, statusCode = 400) {
     success: false,
     message,
     data: null
+  });
+}
+
+function generateToken(userId) {
+  return jwt.sign({ id: userId }, process.env.JWT_SECRET, {
+    expiresIn: "30d"
   });
 }
 
@@ -64,12 +72,18 @@ function validateLoginInput(email, password) {
   return "";
 }
 
+// ----------------------------------------------------
+// Health Check
+// ----------------------------------------------------
 router.get("/health", function (request, response) {
   sendSuccess(response, "Nexus Chat backend is running", {
     database: mongoose.connection.readyState === 1 ? "connected" : "disconnected"
   });
 });
 
+// ----------------------------------------------------
+// Authentication Routes (Public)
+// ----------------------------------------------------
 router.post("/auth/signup", async function (request, response) {
   try {
     const { username, email, password } = request.body;
@@ -93,11 +107,15 @@ router.post("/auth/signup", async function (request, response) {
     });
 
     await newUser.save();
+    const token = generateToken(newUser._id);
 
     return sendSuccess(
       response,
       "Account created successfully.",
-      { user: createPublicUser(newUser) },
+      {
+        token,
+        user: createPublicUser(newUser)
+      },
       201
     );
   } catch (error) {
@@ -129,7 +147,10 @@ router.post("/auth/login", async function (request, response) {
       return sendError(response, "Invalid email or password.", 401);
     }
 
+    const token = generateToken(user._id);
+
     return sendSuccess(response, "Login successful.", {
+      token,
       user: createPublicUser(user)
     });
   } catch (error) {
@@ -137,9 +158,51 @@ router.post("/auth/login", async function (request, response) {
   }
 });
 
-router.get("/users", async function (request, response) {
+// ----------------------------------------------------
+// Current User Profile & Settings (Protected)
+// ----------------------------------------------------
+router.get("/users/me", protectRoute, function (request, response) {
+  return sendSuccess(response, "User profile fetched successfully.", {
+    user: createPublicUser(request.user)
+  });
+});
+
+router.patch("/users/me", protectRoute, async function (request, response) {
   try {
-    const users = await User.find({}).sort({ createdAt: -1 });
+    const allowedUpdates = ["username", "profilePic", "theme", "background", "aiAssistant"];
+    const updates = request.body;
+
+    for (const key of Object.keys(updates)) {
+      if (allowedUpdates.includes(key)) {
+        if (key === "username") {
+          const trimmed = updates[key].trim();
+          if (trimmed.length < 3 || !usernamePattern.test(trimmed)) {
+            return sendError(response, "Invalid username format.");
+          }
+          request.user.username = trimmed;
+        } else {
+          request.user[key] = updates[key];
+        }
+      }
+    }
+
+    await request.user.save();
+
+    return sendSuccess(response, "Profile updated successfully.", {
+      user: createPublicUser(request.user)
+    });
+  } catch (error) {
+    return sendError(response, error.message || "Failed to update profile.", 500);
+  }
+});
+
+// ----------------------------------------------------
+// Contacts / Users Directory (Protected)
+// ----------------------------------------------------
+router.get("/users", protectRoute, async function (request, response) {
+  try {
+    // Return all users except the current authenticated user
+    const users = await User.find({ _id: { $ne: request.user._id } }).sort({ createdAt: -1 });
     const publicUsers = users.map(function (user) {
       return createPublicUser(user);
     });
@@ -152,11 +215,11 @@ router.get("/users", async function (request, response) {
   }
 });
 
-router.get("/users/:id", async function (request, response) {
+router.get("/users/:id", protectRoute, async function (request, response) {
   try {
     const { id } = request.params;
     if (!mongoose.Types.ObjectId.isValid(id)) {
-      return sendError(response, "Invalid user ID.", 400);
+      return sendError(response, "Invalid user ID format.", 400);
     }
 
     const user = await User.findById(id);
@@ -173,63 +236,86 @@ router.get("/users/:id", async function (request, response) {
   }
 });
 
-async function findUserByIdOrDb(id) {
-  if (mongoose.Types.ObjectId.isValid(id)) {
-    return await User.findById(id);
-  }
-  return null;
-}
-
-router.post("/messages", async function (request, response) {
+// ----------------------------------------------------
+// Messages (Protected)
+// ----------------------------------------------------
+router.post("/messages", protectRoute, async function (request, response) {
   try {
-    const { senderId, receiverId, content } = request.body;
+    const { receiverId, content } = request.body;
 
-    if (!senderId || !receiverId || !content || !content.trim()) {
-      return sendError(response, "Sender, receiver, and message content are required.");
+    if (!receiverId || !content || !content.trim()) {
+      return sendError(response, "Receiver ID and message content are required.");
     }
 
-    const sender = await findUserByIdOrDb(senderId);
-    const receiver = await findUserByIdOrDb(receiverId);
-
-    if (!sender || !receiver) {
-      return sendError(response, "Sender or receiver was not found.", 404);
+    if (!mongoose.Types.ObjectId.isValid(receiverId)) {
+      return sendError(response, "Invalid receiver ID format.", 400);
     }
 
-    const newMessage = {
-      id: Date.now().toString(),
-      senderId,
+    const receiver = await User.findById(receiverId);
+    if (!receiver) {
+      return sendError(response, "Recipient user not found.", 404);
+    }
+
+    const newMessage = new Message({
+      senderId: request.user._id,
       receiverId,
-      content: content.trim(),
-      createdAt: new Date().toISOString()
-    };
+      content: content.trim()
+    });
 
-    messages.push(newMessage);
+    await newMessage.save();
 
-    return sendSuccess(response, "Message sent successfully.", {
-      message: newMessage
-    }, 201);
+    return sendSuccess(
+      response,
+      "Message sent successfully.",
+      {
+        message: newMessage
+      },
+      201
+    );
   } catch (error) {
     return sendError(response, error.message || "Failed to send message.", 500);
   }
 });
 
-router.get("/messages/:firstUserId/:secondUserId", async function (request, response) {
+// Fetch conversation with a specific user
+router.get("/messages/:otherUserId", protectRoute, async function (request, response) {
+  try {
+    const { otherUserId } = request.params;
+
+    if (!mongoose.Types.ObjectId.isValid(otherUserId)) {
+      return sendError(response, "Invalid contact user ID.", 400);
+    }
+
+    const chatMessages = await Message.find({
+      $or: [
+        { senderId: request.user._id, receiverId: otherUserId },
+        { senderId: otherUserId, receiverId: request.user._id }
+      ]
+    }).sort({ createdAt: 1 });
+
+    return sendSuccess(response, "Messages fetched successfully.", {
+      messages: chatMessages
+    });
+  } catch (error) {
+    return sendError(response, error.message || "Failed to fetch messages.", 500);
+  }
+});
+
+// Legacy route for compatibility: /messages/:firstUserId/:secondUserId
+router.get("/messages/:firstUserId/:secondUserId", protectRoute, async function (request, response) {
   try {
     const { firstUserId, secondUserId } = request.params;
 
-    const firstUser = await findUserByIdOrDb(firstUserId);
-    const secondUser = await findUserByIdOrDb(secondUserId);
-
-    if (!firstUser || !secondUser) {
-      return sendError(response, "One or both users were not found.", 404);
+    if (!mongoose.Types.ObjectId.isValid(firstUserId) || !mongoose.Types.ObjectId.isValid(secondUserId)) {
+      return sendError(response, "Invalid user IDs.", 400);
     }
 
-    const chatMessages = messages.filter(function (message) {
-      const firstDirection = message.senderId === firstUserId && message.receiverId === secondUserId;
-      const secondDirection = message.senderId === secondUserId && message.receiverId === firstUserId;
-
-      return firstDirection || secondDirection;
-    });
+    const chatMessages = await Message.find({
+      $or: [
+        { senderId: firstUserId, receiverId: secondUserId },
+        { senderId: secondUserId, receiverId: firstUserId }
+      ]
+    }).sort({ createdAt: 1 });
 
     return sendSuccess(response, "Messages fetched successfully.", {
       messages: chatMessages

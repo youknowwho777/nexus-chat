@@ -160,7 +160,7 @@ Done:
 - Added a simple 404 API response for wrong routes.
 - Verified signup, login, users list, send message, and fetch messages using REST requests.
 
-## Day 14
+## Day 14 - 17
 Connected MongoDB Atlas and added real User schema persistence.
 
 Done:
@@ -178,15 +178,31 @@ Done:
 - Verified MongoDB connection, signup, login, and user queries with live requests.
 - Verified production build and pushed all updates to GitHub.
 
+## Day 18
+Added JWT authentication, protected routes, Message model, and real React chat connection.
+
+Done:
+- Installed `jsonwebtoken` in the backend.
+- Created `backend/middleware/authMiddleware.js` to protect private endpoints with `protectRoute`.
+- Updated `/api/auth/signup` and `/api/auth/login` to return signed JWT tokens.
+- Added `GET /api/users/me` and `PATCH /api/users/me` to fetch and update user settings in MongoDB.
+- Created `backend/models/Message.js` using Mongoose for the `messages` collection with compound indexes.
+- Migrated `POST /api/messages` and `GET /api/messages/:otherUserId` to MongoDB and removed `backend/data/store.js`.
+- Created frontend `apiClient.js` with automatic JWT header injection.
+- Created frontend services `userApi.js` and `messageApi.js`.
+- Updated `App.jsx`, `LoginPage.jsx`, and `CreateAccountPage.jsx` to store and manage JWT tokens in `localStorage`.
+- Connected `ChatPage.jsx` to fetch real registered users from MongoDB into the sidebar.
+- Connected `ChatPage.jsx` to send and receive real persistent conversation messages in MongoDB Atlas.
+- Verified frontend production build with zero errors.
+
 ## Current State
-The backend is now connected to MongoDB Atlas (`NexusChat` database).
-User accounts, signup, login, and user listing now use the real MongoDB `users` collection with hashed passwords.
-Chat messages still use temporary in-memory arrays until the Message model is added.
-Frontend chat UI and user settings are still stored locally in the browser.
+The backend and frontend are now fully connected to MongoDB Atlas (`NexusChat` database).
+Both User accounts and Chat messages are 100% persistent in MongoDB.
+API endpoints are secured with JWT authentication and middleware.
+Contacts in the sidebar and chat conversations load dynamically from the real database.
 
 ## Next Work
-- Add JWT token generation and auth middleware to protect private routes.
-- Create the Mongoose Message model for MongoDB message persistence.
-- Replace temporary in-memory message routes with MongoDB queries.
-- Connect the React chat page to real backend messages and users.
+- Prepare the project for real-time live messaging using Socket.IO.
+- Add live typing indicators and online/offline presence indicators.
+
 

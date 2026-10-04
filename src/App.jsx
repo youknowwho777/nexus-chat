@@ -11,14 +11,16 @@ import ChatPage from "./pages/ChatPage.jsx";
 import CreateAccountPage from "./pages/CreateAccountPage.jsx";
 import LoginPage from "./pages/LoginPage.jsx";
 import SettingsPage from "./pages/SettingsPage.jsx";
+import { fetchUserProfile, updateUserProfile } from "./services/userApi.js";
 
-const storageKeys = { // LocalStorage key names.
+const storageKeys = {
+  token: "nexus:token",
   user: "nexus:user",
   chats: "nexus:chats",
   settings: "nexus:settings"
 };
 
-const defaultSettings = { // Default settings before the user changes them.
+const defaultSettings = {
   displayName: "Siddu",
   email: "siddu@nexus.dev",
   theme: "blue",
@@ -26,7 +28,7 @@ const defaultSettings = { // Default settings before the user changes them.
   aiAssistant: true
 };
 
-function readStorage(key, fallback){ // Safely read saved LocalStorage data.
+function readStorage(key, fallback) {
   try {
     const savedValue = window.localStorage.getItem(key);
     return savedValue ? JSON.parse(savedValue) : fallback;
@@ -35,35 +37,72 @@ function readStorage(key, fallback){ // Safely read saved LocalStorage data.
   }
 }
 
-function writeStorage(key, value){ // Save data to LocalStorage.
+function writeStorage(key, value) {
   window.localStorage.setItem(key, JSON.stringify(value));
 }
 
-function ProtectedRoute({ currentUser, children }){
-  if(!currentUser){
+function ProtectedRoute({ currentUser, children }) {
+  if (!currentUser) {
     return <Navigate to="/" replace />;
   }
 
   return children;
 }
 
-function AppRoutes(){
+function AppRoutes() {
   const navigate = useNavigate();
-  const [currentUser, setCurrentUser] = useState(function(){
+  const [currentUser, setCurrentUser] = useState(function () {
     return readStorage(storageKeys.user, null);
   });
-  const [chats, setChats] = useState(function(){
+  const [chats, setChats] = useState(function () {
     return readStorage(storageKeys.chats, createInitialChats());
   });
-  const [settings, setSettings] = useState(function(){
+  const [settings, setSettings] = useState(function () {
     return {
       ...defaultSettings,
       ...readStorage(storageKeys.settings, {})
     };
   });
 
-  useEffect(function(){
-    if(currentUser){
+  // Verify and refresh profile from database on app load if token exists
+  useEffect(function () {
+    const token = window.localStorage.getItem(storageKeys.token);
+    if (!token) return;
+
+    fetchUserProfile()
+      .then(function (userProfile) {
+        if (userProfile) {
+          setCurrentUser(function (existing) {
+            return {
+              ...existing,
+              id: userProfile.id,
+              name: userProfile.username,
+              email: userProfile.email
+            };
+          });
+
+          setSettings(function (prev) {
+            return {
+              ...prev,
+              displayName: userProfile.username || prev.displayName,
+              email: userProfile.email || prev.email,
+              theme: userProfile.theme || prev.theme,
+              background: userProfile.background || prev.background,
+              aiAssistant: userProfile.aiAssistant !== undefined ? userProfile.aiAssistant : prev.aiAssistant
+            };
+          });
+        }
+      })
+      .catch(function () {
+        // If token expired or invalid, reset session
+        window.localStorage.removeItem(storageKeys.token);
+        window.localStorage.removeItem(storageKeys.user);
+        setCurrentUser(null);
+      });
+  }, []);
+
+  useEffect(function () {
+    if (currentUser) {
       writeStorage(storageKeys.user, currentUser);
       return;
     }
@@ -71,45 +110,66 @@ function AppRoutes(){
     window.localStorage.removeItem(storageKeys.user);
   }, [currentUser]);
 
-  useEffect(function(){
+  useEffect(function () {
     writeStorage(storageKeys.chats, chats);
   }, [chats]);
 
-  useEffect(function(){
+  useEffect(function () {
     writeStorage(storageKeys.settings, settings);
   }, [settings]);
 
-  function handleLoginSuccess(userDetails){
+  function handleLoginSuccess(userDetails) {
+    if (userDetails.token) {
+      window.localStorage.setItem(storageKeys.token, userDetails.token);
+    }
+
     const nextUser = {
+      id: userDetails.id,
       name: userDetails.username || settings.displayName,
       email: userDetails.email
     };
 
     setCurrentUser(nextUser);
-    setSettings(function(currentSettings){
+    setSettings(function (currentSettings) {
       return {
         ...currentSettings,
-        email: userDetails.email
+        displayName: userDetails.username || currentSettings.displayName,
+        email: userDetails.email,
+        theme: userDetails.theme || currentSettings.theme,
+        background: userDetails.background || currentSettings.background,
+        aiAssistant: userDetails.aiAssistant !== undefined ? userDetails.aiAssistant : currentSettings.aiAssistant
       };
     });
     navigate("/chat");
   }
 
-  function handleAccountCreated(userDetails){
-    setSettings(function(currentSettings){
-      return {
-        ...currentSettings,
-        displayName: userDetails.username,
+  function handleAccountCreated(userDetails) {
+    if (userDetails.token) {
+      window.localStorage.setItem(storageKeys.token, userDetails.token);
+      const nextUser = {
+        id: userDetails.id,
+        name: userDetails.username,
         email: userDetails.email
       };
-    });
+      setCurrentUser(nextUser);
+      setSettings(function (currentSettings) {
+        return {
+          ...currentSettings,
+          displayName: userDetails.username,
+          email: userDetails.email
+        };
+      });
+      navigate("/chat");
+      return;
+    }
+
     navigate("/");
   }
 
-  function handleSettingsChange(nextSettings){
+  async function handleSettingsChange(nextSettings) {
     setSettings(nextSettings);
-    setCurrentUser(function(user){
-      if(!user){
+    setCurrentUser(function (user) {
+      if (!user) {
         return user;
       }
 
@@ -119,9 +179,22 @@ function AppRoutes(){
         email: nextSettings.email
       };
     });
+
+    try {
+      await updateUserProfile({
+        username: nextSettings.displayName,
+        theme: nextSettings.theme,
+        background: nextSettings.background,
+        aiAssistant: nextSettings.aiAssistant
+      });
+    } catch (error) {
+      console.warn("Could not sync settings to database:", error.message);
+    }
   }
 
-  function handleLogout(){
+  function handleLogout() {
+    window.localStorage.removeItem(storageKeys.token);
+    window.localStorage.removeItem(storageKeys.user);
     setCurrentUser(null);
     navigate("/");
   }
@@ -132,7 +205,7 @@ function AppRoutes(){
         path="/"
         element={
           <LoginPage
-            onCreateAccountClick={function(){
+            onCreateAccountClick={function () {
               navigate("/create-account");
             }}
             onLoginSuccess={handleLoginSuccess}
@@ -144,7 +217,7 @@ function AppRoutes(){
         element={
           <CreateAccountPage
             onAccountCreated={handleAccountCreated}
-            onLoginClick={function(){
+            onLoginClick={function () {
               navigate("/");
             }}
           />
@@ -159,7 +232,7 @@ function AppRoutes(){
               currentUser={currentUser}
               settings={settings}
               setChats={setChats}
-              onSettingsClick={function(){
+              onSettingsClick={function () {
                 navigate("/settings");
               }}
             />
@@ -174,7 +247,7 @@ function AppRoutes(){
               currentUser={currentUser}
               settings={settings}
               onSettingsChange={handleSettingsChange}
-              onBackClick={function(){
+              onBackClick={function () {
                 navigate("/chat");
               }}
               onLogoutClick={handleLogout}
@@ -187,7 +260,7 @@ function AppRoutes(){
   );
 }
 
-export default function App(){
+export default function App() {
   return (
     <BrowserRouter>
       <AppRoutes />
