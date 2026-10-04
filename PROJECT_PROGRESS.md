@@ -160,13 +160,33 @@ Done:
 - Added a simple 404 API response for wrong routes.
 - Verified signup, login, users list, send message, and fetch messages using REST requests.
 
+## Day 14
+Connected MongoDB Atlas and added real User schema persistence.
+
+Done:
+- Installed `mongoose` and `bcryptjs` in the backend.
+- Created `backend/config/db.js` to connect Express to the MongoDB Atlas cluster (`NexusChat` database).
+- Updated `backend/server.js` to connect to MongoDB before starting the server.
+- Created `backend/models/User.js` using Mongoose for the `users` collection.
+- Added validation for username, unique lowercase email, and password.
+- Added automatic bcrypt password hashing before saving user documents.
+- Added safe public user helper methods so passwords are never returned in responses.
+- Updated `POST /api/auth/signup` to save real users in MongoDB with duplicate email prevention.
+- Updated `POST /api/auth/login` to verify saved users using bcrypt password comparison.
+- Updated `GET /api/users` and `GET /api/users/:id` to fetch real users from MongoDB.
+- Created `backend/.env.example` and verified `.env` is kept private by git.
+- Verified MongoDB connection, signup, login, and user queries with live requests.
+- Verified production build and pushed all updates to GitHub.
+
 ## Current State
-The React frontend now talks to a basic Express backend for signup and login.
-Users and messages are still stored in temporary in-memory arrays, so they reset when the backend restarts.
-Chat UI and settings data are still stored locally in the browser.
+The backend is now connected to MongoDB Atlas (`NexusChat` database).
+User accounts, signup, login, and user listing now use the real MongoDB `users` collection with hashed passwords.
+Chat messages still use temporary in-memory arrays until the Message model is added.
+Frontend chat UI and user settings are still stored locally in the browser.
 
 ## Next Work
-- Review the REST API flow once from frontend to backend.
-- Start MongoDB Atlas and Mongoose.
-- Replace the temporary users array with a real User model.
-- Replace the temporary messages array with a real Message model.
+- Add JWT token generation and auth middleware to protect private routes.
+- Create the Mongoose Message model for MongoDB message persistence.
+- Replace temporary in-memory message routes with MongoDB queries.
+- Connect the React chat page to real backend messages and users.
+
