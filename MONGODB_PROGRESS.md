@@ -10,30 +10,26 @@ This plan covers MongoDB, user persistence, message persistence, profile/setting
 
 This plan stops before Socket.IO.
 
-## Current State Before MongoDB
+## Current State (Active MongoDB & User Persistence)
 
 Done already:
 
 - React frontend is working with routes for login, create account, chat, and settings.
 - Express backend is created in the `backend` folder.
-- Backend routes exist for signup, login, users, and messages.
-- Signup and login currently use temporary backend arrays.
-- Messages currently use temporary backend arrays.
+- MongoDB Atlas cluster is connected (`NexusChat` database via Mongoose).
+- `User` model is created targeting the `users` collection with validation.
+- User signup and login use MongoDB with bcrypt password hashing.
+- Temporary `users` array is completely removed.
+- Backend routes for signup, login, and user queries read/write to MongoDB.
+- Messages currently use temporary backend arrays (`backend/data/store.js`).
 - Chat UI still uses local frontend mock chat data.
 - Settings are still saved in browser `localStorage`.
 
-Temporary backend files:
+Current active storage:
 
 ```txt
-backend/data/store.js
-backend/routes/apiRoutes.js
-```
-
-Current temporary storage:
-
-```js
-users = []
-messages = []
+users: MongoDB Atlas ('NexusChat.users')
+messages: Temporary backend array ('messages = []')
 ```
 
 ## Phase 1: MongoDB Foundation
@@ -42,19 +38,19 @@ Goal: create the real database connection and prepare the backend for MongoDB mo
 
 Tasks:
 
-- Create a MongoDB Atlas account.
-- Create a free MongoDB cluster.
-- Create a database user.
-- Add the local/current IP address to Atlas network access.
-- Copy the MongoDB connection string.
-- Create a backend `.env` file.
-- Store the connection string in `.env`.
-- Add `PORT`, `CLIENT_URL`, and `MONGODB_URI` to `.env`.
-- Install Mongoose in the backend.
-- Create a MongoDB connection file.
-- Connect Express server to MongoDB before starting routes.
-- Test that the backend connects successfully.
-- Make sure `.env` is ignored by git.
+- [x] Create a MongoDB Atlas account.
+- [x] Create a free MongoDB cluster.
+- [x] Create a database user.
+- [x] Add the local/current IP address to Atlas network access.
+- [x] Copy the MongoDB connection string.
+- [x] Create a backend `.env` file.
+- [x] Store the connection string in `.env`.
+- [x] Add `PORT`, `CLIENT_URL`, and `MONGODB_URI` to `.env`.
+- [x] Install Mongoose in the backend.
+- [x] Create a MongoDB connection file.
+- [x] Connect Express server to MongoDB before starting routes.
+- [x] Test that the backend connects successfully.
+- [x] Make sure `.env` is ignored by git.
 
 Recommended backend dependency:
 
@@ -90,28 +86,28 @@ Goal: replace temporary user storage with MongoDB and make authentication produc
 
 Tasks:
 
-- Create a `models` folder inside `backend`.
-- Create a User model using Mongoose.
-- Add fields for account data, profile data, and settings data.
-- Add unique email rule.
-- Add timestamps.
-- Save email lowercase.
-- Install bcrypt package.
-- During signup, hash the password before saving.
-- Save only the password hash.
-- Update signup route to save users in MongoDB.
-- Update login route to find users from MongoDB.
-- During login, compare entered password with saved hash.
-- Remove direct usage of the temporary `users` array for auth.
-- Keep public user responses safe.
-- Make sure password/passwordHash is never returned in API responses.
-- Install JWT package.
-- Add `JWT_SECRET` to `.env`.
-- Generate a JWT after successful login.
-- Decide where to store the token.
-- Create auth middleware.
-- Add logout behavior.
-- Update frontend auth flow to remember the logged-in user correctly.
+- [x] Create a `models` folder inside `backend`.
+- [x] Create a User model using Mongoose.
+- [x] Add fields for account data, profile data, and settings data.
+- [x] Add unique email rule.
+- [x] Add timestamps.
+- [x] Save email lowercase.
+- [x] Install bcrypt package (`bcryptjs`).
+- [x] During signup, hash the password before saving.
+- [x] Save only the password hash.
+- [x] Update signup route to save users in MongoDB.
+- [x] Update login route to find users from MongoDB.
+- [x] During login, compare entered password with saved hash.
+- [x] Remove direct usage of the temporary `users` array for auth.
+- [x] Keep public user responses safe.
+- [x] Make sure password/passwordHash is never returned in API responses.
+- [x] Add `JWT_SECRET` to `.env`.
+- [ ] Install JWT package (`jsonwebtoken`).
+- [ ] Generate a JWT after successful login.
+- [ ] Decide where to store the token.
+- [ ] Create auth middleware.
+- [ ] Add logout behavior.
+- [ ] Update frontend auth flow to remember the logged-in user correctly.
 
 Recommended backend dependencies:
 
@@ -331,10 +327,10 @@ Socket.IO should begin only after:
 
 ## Next Immediate Step
 
-Start with Phase 1:
+Complete the remaining items in Phase 2:
 
 ```txt
-MongoDB Atlas setup + backend Mongoose connection
+Install jsonwebtoken + implement JWT generation on login + protect routes with auth middleware
 ```
 
-After that, move to Phase 2 and replace the temporary `users` array with the real MongoDB User model.
+After completing JWT authentication, move directly to **Phase 3** (create Mongoose `Message` model and connect React chat messages to MongoDB).
